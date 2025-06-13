@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerador de Relatórios - ToLearn</title>
+    <link rel="stylesheet" href="./css/index.css" />
+    <style>
+      .container {
+        width: 90%;
+        max-width: 1200px;
+      }
+      
+      .form-area {
+        display: block;
+      }
+      
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      
+      label {
+        display: block;
+        color: #f2f2f2;
+        margin-bottom: 0.5rem;
+      }
+      
+      textarea, input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #555;
+        border-radius: 8px;
+        background-color: #333;
+        color: #f2f2f2;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      
+      .button-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+      }
+      
+      button {
+        padding: 12px 24px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1rem;
+      }
+      
+      button:hover {
+        background-color: #45a049;
+      }
+      
+      #exemplo {
+        background-color: #2196F3;
+      }
+      
+      #exemplo:hover {
+        background-color: #0b7dda;
+      }
+      
+      .tabs {
+        display: flex;
+        margin-bottom: 20px;
+      }
+      
+      .tab {
+        padding: 10px 20px;
+        background-color: #333;
+        color: #f2f2f2;
+        border: none;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px 5px 0 0;
+      }
+      
+      .tab.active {
+        background-color: #4CAF50;
+      }
+      
+      .tab-content {
+        display: none;
+      }
+      
+      .tab-content.active {
+        display: block;
+      }
+      
+      #resultado {
+        background-color: #333;
+        color: #f2f2f2;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        white-space: pre-wrap;
+        line-height: 1.5;
+        max-height: 500px;
+        overflow-y: auto;
+      }
+      
+      .loader {
+        border: 5px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 5px solid #4CAF50;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+        display: none;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1 style="color: #f2f2f2; text-align: center;">ToLearn - Ferramenta de IA</h1>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="relatório">Gerador de Relatórios EDO</button>
+        <button class="tab" data-tab="chat">Chat com IA</button>
+        <button class="tab" data-tab="docs">Documentação API</button>
+      </div>
+      
+      <div id="relatório-tab" class="tab-content active">
+        <div class="form-area">
+          <div class="form-group">
+            <label for="dadosEDO">Dados do EDO (formato JSON):</label>
+            <textarea id="dadosEDO" placeholder="Cole aqui os dados do EDO no formato JSON"></textarea>
+          </div>
+          
+          <div class="button-container">
+            <button id="btnExemplo" type="button">Carregar Exemplo</button>
+            <button id="btnGerar" type="button">Gerar Relatório</button>
+            <button id="btnPDF" type="button" style="background-color: #ff5722;">Baixar PDF</button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="chat-tab" class="tab-content">
+        <div class="chat-area" id="chatArea"></div>
+        <div class="empty-chat"></div>
+        
+        <div class="form-area" style="display: flex;">
+          <input
+            type="text"
+            id="inputMessage"
+            placeholder="Digite sua mensagem..."
+          />
+          <button id="btnSend">Enviar</button>
+        </div>
+      </div>
+      
+      <div id="docs-tab" class="tab-content">
+        <div style="padding: 20px; background-color: #333; color: #f2f2f2; border-radius: 8px;">
+          <h2>Documentação da API</h2>
+          <p>Acesse a documentação Swagger completa da API no link abaixo:</p>
+          <a href="/api-docs" target="_blank" style="color: #4CAF50; text-decoration: none; font-weight: bold;">Abrir Swagger UI</a>
+          
+          <h3>Endpoints Disponíveis:</h3>
+          <ul>
+            <li><strong>POST /api/chat</strong> - Envia uma mensagem para o chat com IA</li>
+            <li><strong>POST /api/relatorio-edo</strong> - Gera um relatório detalhado para um EDO</li>
+            <li><strong>POST /api/relatorio-edo/pdf</strong> - Gera um relatório detalhado em formato PDF para download</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="loader" id="loader"></div>
+      <div id="resultado"></div>
+    </div>
+
+    <script>
+      // Controle de Tabs
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabName = tab.getAttribute('data-tab');
+          
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+          
+          tab.classList.add('active');
+          document.getElementById(`${tabName}-tab`).classList.add('active');
+        });
+      });
+      
+      // Funcionalidade do Chat
+      const inputMessage = document.getElementById("inputMessage");
+      const btnSend = document.getElementById("btnSend");
+      const chatArea = document.getElementById("chatArea");
+      
+      function addMessage(message, sender) {
+        const divMessage = document.createElement("div");
+        divMessage.classList.add("message", sender);
+        divMessage.innerHTML = marked.parse(message);
+      
+        chatArea.appendChild(divMessage);
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+      
+      async function sendMessage() {
+        const message = inputMessage.value.trim();
+        inputMessage.value = "";
+        inputMessage.focus();
+      
+        if (!message) return;
+      
+        addMessage(message, "user");
+      
+        try {
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message }),
+          });
+      
+          const data = await response.json();
+      
+          if (response.ok) {
+            addMessage(data.response, "bot");
+          } else {
+            addMessage(data.error, "bot");
+          }
+        } catch (error) {
+          addMessage(error.message, "bot");
+        }
+      }
+      
+      btnSend.addEventListener("click", sendMessage);
+      inputMessage.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      });
+      
+      // Funcionalidade de Geração de Relatórios
+      const dadosEDO = document.getElementById("dadosEDO");
+      const btnGerar = document.getElementById("btnGerar");
+      const btnExemplo = document.getElementById("btnExemplo");
+      const resultado = document.getElementById("resultado");
+      const loader = document.getElementById("loader");
+      
+      // Dados de exemplo
+      const dadosExemplo = {
+        "nome_aluno": "Ewerton Barreto Lima",
+        "disciplina": "Matemática",
+        "turma": "3ºA",
+        "serie": "3º ano do Ensino Médio",
+        "tema_edo": "Estudo analítico do ponto",
+        "nota_edo": 8.3,
+        "data_inicio": "08/06/2025 14:12",
+        "data_termino": "08/06/2025 14:36",
+        "tempo_total_execucao": "00:24:12",
+        "tempo_medio_questao": "02:01",
+        "nivel_maximo_taxonomia": "Criar / Fácil",
+        "questoes_erradas": [
+          {
+            "numero": 3,
+            "nivel": "Aplicar / Difícil",
+            "texto_questao": "Os pontos A(1,2), B(3,4) e C(5,6) formam qual tipo de figura no plano cartesiano?",
+            "alternativa_escolhida": "Triângulo escaleno",
+            "alternativa_correta": "Segmento de reta"
+          },
+          {
+            "numero": 5,
+            "nivel": "Analisar / Médio",
+            "texto_questao": "Qual ponto equidistante entre A e B melhor representa o centro da circunferência que passa por ambos?",
+            "alternativa_escolhida": "Ponto M",
+            "alternativa_correta": "Ponto N"
+          }
+        ],
+        "total_acertos": 8,
+        "total_erros": 2,
+        "notas_por_nivel": {
+          "Lembrar": 9.2,
+          "Compreender": 9.1,
+          "Aplicar": 7.2,
+          "Analisar": 6.6,
+          "Avaliar": 4.4,
+          "Criar": 3.8
+        }
+      };
+      
+      btnExemplo.addEventListener("click", () => {
+        dadosEDO.value = JSON.stringify(dadosExemplo, null, 2);
+      });
+      
+      btnGerar.addEventListener("click", async () => {
+        try {
+          // Validar JSON
+          const dados = JSON.parse(dadosEDO.value);
+          
+          // Mostrar loader
+          loader.style.display = "block";
+          resultado.innerHTML = "";
+          
+          // Enviar requisição
+          const response = await fetch("/api/relatorio-edo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dados }),
+          });
+          
+          const data = await response.json();
+          
+          // Esconder loader
+          loader.style.display = "none";
+          
+          if (response.ok) {
+            resultado.innerHTML = marked.parse(data.relatorio);
+          } else {
+            resultado.textContent = `Erro: ${data.error}`;
+          }
+        } catch (error) {
+          loader.style.display = "none";
+          resultado.textContent = `Erro: ${error.message}`;
+          
+          if (error instanceof SyntaxError) {
+            resultado.textContent = "Erro: O JSON fornecido é inválido. Verifique a formatação.";
+          }
+        }
+      });
+      
+      // Funcionalidade de Download de PDF
+      const btnPDF = document.getElementById("btnPDF");
+      
+      btnPDF.addEventListener("click", async () => {
+        try {
+          // Validar JSON
+          const dados = JSON.parse(dadosEDO.value);
+          
+          // Verificar se há dados
+          if (!dados.nome_aluno) {
+            throw new Error("Os dados do aluno são necessários para gerar o PDF.");
+          }
+          
+          // Mostrar loader
+          loader.style.display = "block";
+          
+          // Abrir nova janela para download do PDF
+          const pdfWindow = window.open("/api/relatorio-edo/pdf", "_blank");
+          
+          // Preparar os dados para a requisição
+          const formData = new FormData();
+          formData.append("dados", JSON.stringify(dados));
+          
+          // Fazer a requisição
+          fetch("/api/relatorio-edo/pdf", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ dados }),
+          })
+          .then(response => {
+            // Esconder loader
+            loader.style.display = "none";
+            
+            if (!response.ok) {
+              throw new Error("Erro ao gerar o PDF");
+            }
+            
+            // Redirecionar para o PDF
+            return response.blob();
+          })
+          .then(blob => {
+            // Criar URL para o blob e abrir em nova janela
+            const url = URL.createObjectURL(blob);
+            
+            // Criar link e clicar para download
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `relatorio-${dados.nome_aluno.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Limpar URL e remover link
+            setTimeout(() => {
+              URL.revokeObjectURL(url);
+              document.body.removeChild(a);
+            }, 100);
+          })
+          .catch(error => {
+            loader.style.display = "none";
+            alert(`Erro: ${error.message}`);
+          });
+          
+        } catch (error) {
+          loader.style.display = "none";
+          alert(error.message);
+          
+          if (error instanceof SyntaxError) {
+            alert("Erro: O JSON fornecido é inválido. Verifique a formatação.");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
