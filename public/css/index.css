@@ -20,6 +20,35 @@ body {
   gap: 16px;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #555;
+}
+
+header h1 {
+  color: #f2f2f2;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.config-link {
+  color: #f2f2f2;
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: #484848;
+  transition: background-color 0.2s;
+}
+
+.config-link:hover {
+  background-color: #555;
+}
+
 .chat-area {
   height: fit-content;
   max-height: 500px;

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configuração de Prompt - Groq API</title>
+    <link rel="stylesheet" href="./css/index.css" />
+    <style>
+      .config-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      h1 {
+        color: #4CAF50;
+        margin-bottom: 20px;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      
+      textarea {
+        width: 100%;
+        min-height: 200px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 14px;
+        resize: vertical;
+      }
+      
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      
+      button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      
+      .primary-button {
+        background-color: #4CAF50;
+        color: white;
+      }
+      
+      .secondary-button {
+        background-color: #f1f1f1;
+        color: #333;
+      }
+      
+      .alert {
+        padding: 10px 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+        display: none;
+      }
+      
+      .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      
+      .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      
+      .nav-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #4CAF50;
+        text-decoration: none;
+      }
+      
+      .nav-link:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="config-container">
+      <h1>Configuração do Prompt do Sistema</h1>
+      
+      <div id="alertBox" class="alert"></div>
+      
+      <div class="form-group">
+        <label for="systemPrompt">Prompt do Sistema:</label>
+        <textarea id="systemPrompt" placeholder="Digite o prompt do sistema aqui..."></textarea>
+        <p>Este prompt é usado para contextualizar o modelo de IA sobre como ele deve responder às perguntas.</p>
+      </div>
+      
+      <div class="button-group">
+        <button id="btnSave" class="primary-button">Salvar Alterações</button>
+        <button id="btnReset" class="secondary-button">Restaurar Padrão</button>
+        <button id="btnTest" class="secondary-button">Testar Prompt</button>
+      </div>
+      
+      <a href="/" class="nav-link">← Voltar para o Chat</a>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const systemPromptTextarea = document.getElementById('systemPrompt');
+        const btnSave = document.getElementById('btnSave');
+        const btnReset = document.getElementById('btnReset');
+        const btnTest = document.getElementById('btnTest');
+        const alertBox = document.getElementById('alertBox');
+        
+        // Função para mostrar alerta
+        function showAlert(message, type) {
+          alertBox.textContent = message;
+          alertBox.className = `alert alert-${type}`;
+          alertBox.style.display = 'block';
+          
+          // Esconde o alerta após 5 segundos
+          setTimeout(() => {
+            alertBox.style.display = 'none';
+          }, 5000);
+        }
+        
+        // Carrega o prompt atual do sistema
+        async function loadCurrentPrompt() {
+          try {
+            const response = await fetch('/api/config/system-prompt');
+            const data = await response.json();
+            
+            if (response.ok) {
+              systemPromptTextarea.value = data.prompt;
+            } else {
+              showAlert('Erro ao carregar o prompt do sistema.', 'danger');
+            }
+          } catch (error) {
+            showAlert(`Erro de conexão: ${error.message}`, 'danger');
+          }
+        }
+        
+        // Salva o novo prompt do sistema
+        async function savePrompt() {
+          const newPrompt = systemPromptTextarea.value.trim();
+          
+          if (!newPrompt) {
+            showAlert('O prompt não pode estar vazio!', 'danger');
+            return;
+          }
+          
+          try {
+            const response = await fetch('/api/config/system-prompt', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ prompt: newPrompt })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+              showAlert('Prompt do sistema atualizado com sucesso!', 'success');
+            } else {
+              showAlert(`Erro: ${data.error || 'Falha ao atualizar o prompt.'}`, 'danger');
+            }
+          } catch (error) {
+            showAlert(`Erro de conexão: ${error.message}`, 'danger');
+          }
+        }
+        
+        // Testa o prompt atual com uma mensagem simples
+        async function testPrompt() {
+          const newPrompt = systemPromptTextarea.value.trim();
+          
+          if (!newPrompt) {
+            showAlert('Digite um prompt para testar!', 'danger');
+            return;
+          }
+          
+          try {
+            const response = await fetch('/api/chat', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                message: "Olá, me diga quem você é e como você pode me ajudar.",
+                systemPrompt: newPrompt
+              })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+              // Abre uma janela modal ou alerta com a resposta
+              alert("Resposta do teste:\n\n" + data.response);
+            } else {
+              showAlert(`Erro: ${data.error || 'Falha ao testar o prompt.'}`, 'danger');
+            }
+          } catch (error) {
+            showAlert(`Erro de conexão: ${error.message}`, 'danger');
+          }
+        }
+        
+        // Restaura o prompt padrão (carregado do .env)
+        async function resetPrompt() {
+          try {
+            // Vamos recarregar a página, o que fará com que o servidor use o valor padrão
+            systemPromptTextarea.value = "Não responda nada fora do contexto de ciência da computação e programação.";
+            showAlert('Prompt restaurado para o valor padrão. Clique em Salvar para confirmar.', 'success');
+          } catch (error) {
+            showAlert(`Erro: ${error.message}`, 'danger');
+          }
+        }
+        
+        // Event listeners
+        btnSave.addEventListener('click', savePrompt);
+        btnReset.addEventListener('click', resetPrompt);
+        btnTest.addEventListener('click', testPrompt);
+        
+        // Carrega o prompt atual ao iniciar
+        loadCurrentPrompt();
+      });
+    </script>
+  </body>
+</html>

@@ -1,20 +1,31 @@
-import express from "express";
-import Groq from "groq-sdk";
-import 'dotenv/config';
-import swaggerJsDoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
-import cors from "cors";
-import PDFDocument from "pdfkit";
+/**
+ * Integração Groq - API ToLearn
+ * Aplicação para integração com a API da Groq para geração de conteúdo por IA
+ * 
+ * Este arquivo contém toda a configuração do servidor Express e as rotas da API
+ */
 
+// Importações das bibliotecas necessárias
+import express from "express";  // Framework web para Node.js
+import Groq from "groq-sdk";    // SDK oficial da Groq para integração com a API
+import 'dotenv/config';         // Carrega variáveis de ambiente do arquivo .env
+import swaggerJsDoc from "swagger-jsdoc";     // Gera especificação OpenAPI a partir de comentários JSDoc
+import swaggerUi from "swagger-ui-express";   // Interface visual para documentação Swagger
+import cors from "cors";         // Middleware para habilitar CORS na API
+import PDFDocument from "pdfkit"; // Biblioteca para geração de PDFs
+
+// Inicialização e configuração do aplicativo Express
 const app = express();
-app.use(express.json());
-app.use(express.static("public"));
-app.use(cors());
+app.use(express.json());                // Middleware para processar JSON no corpo das requisições
+app.use(express.static("public"));      // Serve arquivos estáticos da pasta 'public'
+app.use(cors());                        // Habilita CORS para todas as rotas
 
-const PORT = process.env.PORT || 3001;
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Configurações e variáveis de ambiente
+const PORT = process.env.PORT || 3001;  // Porta do servidor (padrão: 3001)
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY }); // Inicializa o cliente Groq com a chave API
+const DEFAULT_SYSTEM_PROMPT = process.env.DEFAULT_SYSTEM_PROMPT || "Não responda nada fora do contexto de ciência da computação e programação."; // Prompt padrão do sistema
 
-// Configuração do Swagger
+// Configuração do Swagger para documentação da API
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
@@ -32,11 +43,77 @@ const swaggerOptions = {
       }
     ]
   },
-  apis: ["./index.js"]
+  apis: ["./index.js"]  // Arquivos onde os comentários JSDoc da API estão localizados
 };
 
+// Inicializa o Swagger e configura a rota para acessar a documentação
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+/**
+ * @swagger
+ * /api/config/system-prompt:
+ *   get:
+ *     summary: Obtém o prompt de sistema atual
+ *     tags: [Configuração]
+ *     responses:
+ *       200:
+ *         description: Prompt de sistema retornado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 prompt:
+ *                   type: string
+ *   put:
+ *     summary: Atualiza o prompt de sistema
+ *     tags: [Configuração]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - prompt
+ *             properties:
+ *               prompt:
+ *                 type: string
+ *                 description: Novo prompt de sistema para contextualizar o modelo
+ *     responses:
+ *       200:
+ *         description: Prompt de sistema atualizado com sucesso
+ *       400:
+ *         description: Prompt não fornecido
+ */
+
+// Variável para armazenar o prompt do sistema atual em memória
+let currentSystemPrompt = DEFAULT_SYSTEM_PROMPT;
+
+// Rota para obter o prompt de sistema atual
+app.get("/api/config/system-prompt", (req, res) => {
+  res.json({ prompt: currentSystemPrompt });
+});
+
+// Rota para atualizar o prompt de sistema
+app.put("/api/config/system-prompt", (req, res) => {
+  const { prompt } = req.body;
+  
+  if (!prompt || prompt.trim() === "") {
+    return res.status(400).json({ error: "Prompt de sistema não fornecido!" });
+  }
+  
+  // Atualiza a variável em memória
+  currentSystemPrompt = prompt.trim();
+  console.log("Prompt do sistema atualizado para:", currentSystemPrompt);
+  
+  res.json({ 
+    success: true, 
+    prompt: currentSystemPrompt,
+    message: "Prompt de sistema atualizado com sucesso!" 
+  });
+});
 
 /**
  * @swagger
@@ -71,36 +148,54 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *       500:
  *         description: Erro ao consultar a API do Groq
  */
-function getGroqChatCompletion(message, systemPrompt = "Não responda nada fora do contexto de ciência da computação e programação.") {
+/**
+ * Função utilitária para interagir com a API da Groq
+ * 
+ * @param {string} message - Mensagem do usuário a ser enviada para o modelo
+ * @param {string} systemPrompt - Prompt do sistema para contextualizar o modelo (instruções)
+ * @returns {Promise} - Promessa que resolve com a resposta da API da Groq
+ */
+function getGroqChatCompletion(message, systemPrompt = null) {
+  // Usa o prompt fornecido ou o prompt atual do sistema (que pode ter sido alterado via API)
+  const finalSystemPrompt = systemPrompt || currentSystemPrompt;
   return groq.chat.completions.create({
     messages: [
       {
         role: "system",
-        content: systemPrompt,
+        content: finalSystemPrompt,  // Instruções para o modelo seguir
       },
       {
         role: "user",
-        content: message,
+        content: message,       // Mensagem do usuário
       },
     ],
-    model: "llama-3.3-70b-versatile",
+    model: "llama-3.3-70b-versatile",  // Modelo da Groq a ser utilizado
   });
 }
 
+/**
+ * Rota para o endpoint do chat com IA
+ * Recebe uma mensagem do usuário e retorna uma resposta gerada pela IA da Groq
+ */
 app.post("/api/chat", async (req, res) => {
-  const { message } = req.body;
+  const { message, systemPrompt } = req.body;  // Extrai a mensagem e o prompt opcional do corpo da requisição
 
+  // Validação da mensagem
   if (!message) {
     return res.status(400).json({ error: "Mensagem não fornecida!" });
   }
 
   try {
-    const responseGroq = await getGroqChatCompletion(message);
+    // Envia a mensagem para a API da Groq e aguarda a resposta (usando o prompt do sistema fornecido, se houver)
+    const responseGroq = await getGroqChatCompletion(message, systemPrompt);
 
+    // Registra a resposta no console para monitoramento
     console.log("Resposta da API Groq:", responseGroq.choices[0]?.message.content);
 
+    // Retorna a resposta como JSON
     res.json({ response: responseGroq.choices[0]?.message?.content || "" });
   } catch (error) {
+    // Tratamento de erro
     console.error("Erro ao chamar a API da Groq:", error.message);
     return res.status(500).json({ error: "Erro ao consultar a API da Groq." });
   }
@@ -171,14 +266,20 @@ app.post("/api/chat", async (req, res) => {
  *       500:
  *         description: Erro ao gerar o relatório
  */
+/**
+ * Rota para geração de relatório EDO (Estudo Dirigido Obrigatório)
+ * Recebe dados do aluno e do EDO e retorna um relatório detalhado gerado pela IA
+ */
 app.post("/api/relatorio-edo", async (req, res) => {
-  const { dados } = req.body;
+  const { dados } = req.body;  // Extrai os dados do corpo da requisição
 
+  // Validação dos dados
   if (!dados || !dados.nome_aluno) {
     return res.status(400).json({ error: "Dados do EDO não fornecidos corretamente!" });
   }
 
   try {
+    // Prompt do sistema com instruções detalhadas para a geração do relatório
     const systemPrompt = `
     Você é um especialista em educação e análise de desempenho acadêmico. 
     Utilize os dados a seguir para gerar um relatório humanizado e pedagógico a respeito do desempenho do aluno em um Estudo Dirigido Obrigatório (EDO), de acordo com a seguinte estrutura:
@@ -202,18 +303,22 @@ app.post("/api/relatorio-edo", async (req, res) => {
     🧠 RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
     `;
 
+    // Prompt do usuário com os dados para gerar o relatório
     const userPrompt = `
     Gere um relatório detalhado para os seguintes dados:
     ${JSON.stringify(dados, null, 2)}
     `;
 
+    // Envia os prompts para a API da Groq e aguarda a resposta
     const responseGroq = await getGroqChatCompletion(userPrompt, systemPrompt);
     const relatorio = responseGroq.choices[0]?.message.content || "";
 
     console.log("Relatório gerado com sucesso!");
 
+    // Retorna o relatório gerado como JSON
     res.json({ relatorio });
   } catch (error) {
+    // Tratamento de erro
     console.error("Erro ao gerar relatório:", error.message);
     return res.status(500).json({ error: "Erro ao gerar o relatório." });
   }
@@ -282,14 +387,20 @@ app.post("/api/relatorio-edo", async (req, res) => {
  *       500:
  *         description: Erro ao gerar o relatório
  */
+/**
+ * Rota para geração de relatório EDO em formato PDF
+ * Recebe dados do aluno e do EDO, gera um relatório detalhado e retorna como PDF para download
+ */
 app.post("/api/relatorio-edo/pdf", async (req, res) => {
-  const { dados } = req.body;
+  const { dados } = req.body;  // Extrai os dados do corpo da requisição
 
+  // Validação dos dados
   if (!dados || !dados.nome_aluno) {
     return res.status(400).json({ error: "Dados do EDO não fornecidos corretamente!" });
   }
 
   try {
+    // Prompt do sistema com instruções detalhadas para a geração do relatório
     const systemPrompt = `
     Você é um especialista em educação e análise de desempenho acadêmico. 
     Utilize os dados a seguir para gerar um relatório humanizado e pedagógico a respeito do desempenho do aluno em um Estudo Dirigido Obrigatório (EDO), de acordo com a seguinte estrutura:
@@ -313,11 +424,13 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
     🧠 RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
     `;
 
+    // Prompt do usuário com os dados para gerar o relatório
     const userPrompt = `
     Gere um relatório detalhado para os seguintes dados:
     ${JSON.stringify(dados, null, 2)}
     `;
 
+    // Envia os prompts para a API da Groq e aguarda a resposta
     const responseGroq = await getGroqChatCompletion(userPrompt, systemPrompt);
     const relatorio = responseGroq.choices[0]?.message.content || "";
 
@@ -327,7 +440,7 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=relatorio-${dados.nome_aluno.replace(/\s+/g, '-').toLowerCase()}.pdf`);
 
-    // Criando o documento PDF
+    // Criando o documento PDF com metadados
     const doc = new PDFDocument({ 
       size: 'A4',
       margin: 50,
@@ -338,7 +451,7 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
       }
     });
 
-    // Pipe do PDF para a resposta
+    // Pipe do PDF para a resposta HTTP
     doc.pipe(res);
 
     // Adicionando logo (simulada com um retângulo colorido)
@@ -450,11 +563,15 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
     console.log("PDF gerado com sucesso!");
     
   } catch (error) {
+    // Tratamento de erro
     console.error("Erro ao gerar relatório em PDF:", error.message);
     return res.status(500).json({ error: "Erro ao gerar o relatório em PDF." });
   }
 });
 
+/**
+ * Inicia o servidor na porta especificada
+ */
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
   console.log(`Documentação Swagger disponível em: http://localhost:${PORT}/api-docs`);
