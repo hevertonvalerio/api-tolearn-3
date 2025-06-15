@@ -17,32 +17,41 @@ import PDFDocument from "pdfkit"; // Biblioteca para geração de PDFs
 // Inicialização e configuração do aplicativo Express
 const app = express();
 app.use(express.json());                // Middleware para processar JSON no corpo das requisições
-app.use(express.static("public"));      // Serve arquivos estáticos da pasta 'public'
-app.use(cors());                        // Habilita CORS para todas as rotas
+app.use(cors());                        // Habilita CORS para todas as rotas/api/config/report-prompt
 
 // Configurações e variáveis de ambiente
-const PORT = process.env.PORT || 3001;  // Porta do servidor (padrão: 3001)
+const PORT = process.env.PORT || 3002;  // Porta do servidor (padrão: 3001)
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY }); // Inicializa o cliente Groq com a chave API
 const DEFAULT_SYSTEM_PROMPT = process.env.DEFAULT_SYSTEM_PROMPT || "Não responda nada fora do contexto de ciência da computação e programação."; // Prompt padrão do sistema
-const DEFAULT_REPORT_PROMPT = `
-Você é um especialista em educação e análise de desempenho acadêmico. 
-Utilize os dados a seguir para gerar um relatório humanizado e pedagógico a respeito do desempenho do aluno em um Estudo Dirigido Obrigatório (EDO), de acordo com a seguinte estrutura:
+const DEFAULT_REPORT_PROMPT = `Você é um assistente educacional especializado em análise de desempenho acadêmico.
+Sua tarefa é gerar um relatório detalhado e humanizado sobre o desempenho do aluno em uma Experiência Digital de Observação (EDO).
 
-1. Análise Geral do Desempenho
-2. Pontos Fortes
-3. Dificuldades Encontradas
-4. Recomendações ao Professor
-5. Conclusão
+Siga estas diretrizes:
+1. Use linguagem clara, pedagógica e acolhedora
+2. Evite jargões técnicos excessivos
+3. Estruture o relatório em seções bem definidas
+4. Destaque pontos fortes e áreas para melhoria
+5. Ofereça sugestões práticas de estudo
+6. Mantenha um tom construtivo e motivador
+7. Use formatação Markdown para melhor legibilidade
+8. Inclua um título atrativo para o relatório
 
-Regras de saída esperada:
-* Use linguagem pedagógica, humanizada e objetiva.
-* A análise deve reconhecer acertos, destacar potenciais e explicar com empatia as dificuldades.
-* A seção de recomendações deve ser útil para o professor saber como apoiar o aluno nos próximos desafios.
-* A conclusão deve reforçar o estágio atual do aluno e seu potencial de progresso.
+IMPORTANTE: O relatório será exibido abaixo de seções estruturadas que já mostram:
+- Um resumo inicial com dados do aluno, da EDO e métricas gerais
+- Uma tabela de desempenho cognitivo com notas por nível da taxonomia de Bloom
+- Uma lista de questões respondidas incorretamente
 
-Formato final: texto corrido estruturado nos 5 blocos mencionados, sem tópicos numéricos no corpo, mas respeitando os títulos. 
-O conteúdo deve ser exclusivo para este aluno, considerando apenas a tentativa com a maior nota.
-    
+Portanto, seu relatório deve COMPLEMENTAR estas informações já exibidas, não as repetir. Concentre-se em:
+- Uma introdução personalizada e acolhedora
+- Análise qualitativa do desempenho (não apenas números)
+- Interpretação pedagógica dos resultados por nível cognitivo
+- Padrões identificados nos erros cometidos
+- Estratégias específicas de estudo baseadas nas dificuldades
+- Pontos fortes a serem celebrados
+- Conclusão motivacional e encorajadora
+
+Lembre-se: este relatório será lido por educadores e pelo próprio aluno, então equilibre honestidade com encorajamento.
+
 Inicie o relatório com:
 🧠 RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
 `; // Prompt padrão para relatórios
@@ -516,23 +525,86 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
        .fontSize(16)
        .text(`Aluno: ${dados.nome_aluno}`, { align: 'center' });
     
-    // Informações do EDO
+    // Seção de resumo inicial com ícones
     doc.moveDown(1.5)
-       .fontSize(14)
+       .fontSize(16)
        .font('Helvetica-Bold')
-       .text('Informações do EDO');
+       .text('📊 RELATÓRIO DE AVALIAÇÃO DO EDO');
     
     doc.moveDown(0.5)
        .fontSize(12)
        .font('Helvetica')
-       .text(`Disciplina: ${dados.disciplina}`)
-       .text(`Turma: ${dados.turma}`)
-       .text(`Tema: ${dados.tema_edo}`)
-       .text(`Nota: ${dados.nota_edo}`)
-       .text(`Data de início: ${dados.data_inicio}`)
-       .text(`Data de término: ${dados.data_termino}`)
-       .text(`Tempo total: ${dados.tempo_total_execucao}`)
-       .text(`Nível máximo alcançado: ${dados.nivel_maximo_taxonomia}`);
+       .text(`👤 Dados do Aluno: Nome: ${dados.nome_aluno}, RA: ${dados.ra || 'N/A'}, Turma: ${dados.turma}`)
+       .moveDown(0.3)
+       .text(`📘 Dados da EDO: Disciplina: ${dados.disciplina}, Professor: ${dados.professor || 'N/A'}, Tema: ${dados.tema_edo}`)
+       .moveDown(0.3)
+       .text(`⏱️ Tempo Total: ${dados.tempo_total_execucao} (média/questão: ${dados.tempo_medio_questao})`)
+       .moveDown(0.3)
+       .text(`🌡️ Nível Máximo Alcançado: ${dados.nivel_maximo_taxonomia}`);
+
+    // Seção de desempenho cognitivo
+    doc.moveDown(1)
+       .fontSize(14)
+       .font('Helvetica-Bold')
+       .text('🧠 Desempenho Cognitivo (Taxonomia de Bloom)');
+    
+    // Tabela de desempenho
+    if (dados.notas_por_nivel) {
+      const niveis = Object.keys(dados.notas_por_nivel);
+      const startY = doc.y + 15;
+      const colWidth = 250;
+      
+      // Cabeçalho da tabela
+      doc.font('Helvetica-Bold')
+         .fontSize(12)
+         .text('Nível', 50, startY)
+         .text('Nota', 50 + colWidth, startY);
+      
+      // Linhas da tabela
+      let rowY = startY + 20;
+      niveis.forEach(nivel => {
+        doc.font('Helvetica')
+           .text(nivel, 50, rowY)
+           .text(dados.notas_por_nivel[nivel].toString(), 50 + colWidth, rowY);
+        rowY += 20;
+      });
+      
+      doc.y = rowY + 10;
+    }
+
+    // Seção de questões erradas
+    doc.moveDown(1)
+       .fontSize(14)
+       .font('Helvetica-Bold')
+       .text('❌ Questões com Erro');
+    
+    if (dados.questoes_erradas && dados.questoes_erradas.length > 0) {
+      doc.moveDown(0.5);
+      dados.questoes_erradas.forEach((questao, index) => {
+        doc.font('Helvetica-Bold')
+           .fontSize(12)
+           .text(`Questão ${questao.numero} (${questao.nivel})`);
+        
+        doc.moveDown(0.3)
+           .font('Helvetica')
+           .text(`❓ ${questao.texto_questao}`);
+        
+        doc.moveDown(0.3)
+           .text(`• Alternativa escolhida: ${questao.alternativa_escolhida}`);
+        
+        doc.moveDown(0.3)
+           .text(`• Alternativa correta: ${questao.alternativa_correta}`);
+        
+        if (index < dados.questoes_erradas.length - 1) {
+          doc.moveDown(0.5);
+        }
+      });
+    } else {
+      doc.moveDown(0.5)
+         .font('Helvetica')
+         .fontSize(12)
+         .text('Nenhuma questão respondida incorretamente.');
+    }
 
     // Divisor
     doc.moveDown(1)
