@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Configuração de Prompt - Groq API</title>
+    <title>Configuração de Prompt de Relatório - Groq API</title>
     <link rel="stylesheet" href="./css/index.css" />
     <style>
       .config-container {
@@ -95,14 +95,14 @@
   </head>
   <body>
     <div class="config-container">
-      <h1>Configuração do Prompt do Sistema</h1>
+      <h1>Configuração do Prompt de Relatório</h1>
       
       <div id="alertBox" class="alert"></div>
       
       <div class="form-group">
-        <label for="systemPrompt">Prompt do Sistema:</label>
-        <textarea id="systemPrompt" placeholder="Digite o prompt do sistema aqui..."></textarea>
-        <p>Este prompt é usado para contextualizar o modelo de IA sobre como ele deve responder às perguntas.</p>
+        <label for="reportPrompt">Prompt do Relatório:</label>
+        <textarea id="reportPrompt" placeholder="Digite o prompt do relatório aqui..."></textarea>
+        <p>Este prompt é usado para contextualizar o modelo de IA sobre como gerar relatórios pedagógicos.</p>
       </div>
       
       <div class="button-group">
@@ -111,13 +111,13 @@
         <button id="btnTest" class="secondary-button">Testar Prompt</button>
       </div>
       
-      <a href="/report-config.html" class="nav-link">Configurar Prompt de Relatório →</a>
+      <a href="/config.html" class="nav-link">← Voltar para Configuração de Prompt Geral</a>
       <a href="/" class="nav-link">← Voltar para o Chat</a>
     </div>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const systemPromptTextarea = document.getElementById('systemPrompt');
+        const reportPromptTextarea = document.getElementById('reportPrompt');
         const btnSave = document.getElementById('btnSave');
         const btnReset = document.getElementById('btnReset');
         const btnTest = document.getElementById('btnTest');
@@ -135,25 +135,25 @@
           }, 5000);
         }
         
-        // Carrega o prompt atual do sistema
+        // Carrega o prompt atual do relatório
         async function loadCurrentPrompt() {
           try {
-            const response = await fetch('/api/config/system-prompt');
+            const response = await fetch('/api/config/report-prompt');
             const data = await response.json();
             
             if (response.ok) {
-              systemPromptTextarea.value = data.prompt;
+              reportPromptTextarea.value = data.prompt;
             } else {
-              showAlert('Erro ao carregar o prompt do sistema.', 'danger');
+              showAlert('Erro ao carregar o prompt do relatório.', 'danger');
             }
           } catch (error) {
             showAlert(`Erro de conexão: ${error.message}`, 'danger');
           }
         }
         
-        // Salva o novo prompt do sistema
+        // Salva o novo prompt do relatório
         async function savePrompt() {
-          const newPrompt = systemPromptTextarea.value.trim();
+          const newPrompt = reportPromptTextarea.value.trim();
           
           if (!newPrompt) {
             showAlert('O prompt não pode estar vazio!', 'danger');
@@ -161,7 +161,7 @@
           }
           
           try {
-            const response = await fetch('/api/config/system-prompt', {
+            const response = await fetch('/api/config/report-prompt', {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
@@ -172,7 +172,7 @@
             const data = await response.json();
             
             if (response.ok) {
-              showAlert('Prompt do sistema atualizado com sucesso!', 'success');
+              showAlert('Prompt do relatório atualizado com sucesso!', 'success');
             } else {
               showAlert(`Erro: ${data.error || 'Falha ao atualizar o prompt.'}`, 'danger');
             }
@@ -183,43 +183,37 @@
         
         // Testa o prompt atual com uma mensagem simples
         async function testPrompt() {
-          const newPrompt = systemPromptTextarea.value.trim();
-          
-          if (!newPrompt) {
-            showAlert('Digite um prompt para testar!', 'danger');
-            return;
-          }
-          
-          try {
-            const response = await fetch('/api/chat', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                message: "Olá, me diga quem você é e como você pode me ajudar.",
-                systemPrompt: newPrompt
-              })
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-              // Abre uma janela modal ou alerta com a resposta
-              alert("Resposta do teste:\n\n" + data.response);
-            } else {
-              showAlert(`Erro: ${data.error || 'Falha ao testar o prompt.'}`, 'danger');
-            }
-          } catch (error) {
-            showAlert(`Erro de conexão: ${error.message}`, 'danger');
-          }
+          // Aqui precisaríamos de dados de exemplo para testar a geração de relatório
+          // Isso é mais complexo do que testar o prompt do sistema, então mostramos um alerta informativo
+          showAlert('Para testar o prompt do relatório, use a página de relatórios com dados reais.', 'success');
         }
         
-        // Restaura o prompt padrão (carregado do .env)
+        // Restaura o prompt padrão
         async function resetPrompt() {
           try {
-            // Vamos recarregar a página, o que fará com que o servidor use o valor padrão
-            systemPromptTextarea.value = "Não responda nada fora do contexto de ciência da computação e programação.";
+            const defaultPrompt = `
+Você é um especialista em educação e análise de desempenho acadêmico. 
+Utilize os dados a seguir para gerar um relatório humanizado e pedagógico a respeito do desempenho do aluno em um Estudo Dirigido Obrigatório (EDO), de acordo com a seguinte estrutura:
+
+1. Análise Geral do Desempenho
+2. Pontos Fortes
+3. Dificuldades Encontradas
+4. Recomendações ao Professor
+5. Conclusão
+
+Regras de saída esperada:
+* Use linguagem pedagógica, humanizada e objetiva.
+* A análise deve reconhecer acertos, destacar potenciais e explicar com empatia as dificuldades.
+* A seção de recomendações deve ser útil para o professor saber como apoiar o aluno nos próximos desafios.
+* A conclusão deve reforçar o estágio atual do aluno e seu potencial de progresso.
+
+Formato final: texto corrido estruturado nos 5 blocos mencionados, sem tópicos numéricos no corpo, mas respeitando os títulos. 
+O conteúdo deve ser exclusivo para este aluno, considerando apenas a tentativa com a maior nota.
+
+Inicie o relatório com:
+🧠 RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
+`;
+            reportPromptTextarea.value = defaultPrompt;
             showAlert('Prompt restaurado para o valor padrão. Clique em Salvar para confirmar.', 'success');
           } catch (error) {
             showAlert(`Erro: ${error.message}`, 'danger');

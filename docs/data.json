@@ -1,0 +1,42 @@
+{
+    "dados": {
+      "nome_aluno": "Ewerton Barreto Lima",
+      "disciplina": "Matemática",
+      "turma": "3ºA",
+      "serie": "3º ano do Ensino Médio",
+      "tema_edo": "Estudo analítico do ponto",
+      "nota_edo": 8.3,
+      "data_inicio": "2025-06-08 14:12",
+      "data_termino": "2025-06-08 14:36",
+      "tempo_total_execucao": "00:24:12",
+      "tempo_medio_questao": "02:01",
+      "nivel_maximo_taxonomia": "Criar / Fácil",
+      "questoes_erradas": [
+        {
+          "numero": 3,
+          "nivel": "Aplicar / Difícil",
+          "texto_questao": "Os pontos A(1,2), B(3,6) e C(5,10) formam qual tipo de figura no plano cartesiano?",
+          "alternativa_escolhida": "Triângulo escaleno",
+          "alternativa_correta": "Segmento de reta"
+        },
+        {
+          "numero": 5,
+          "nivel": "Analisar / Médio",
+          "texto_questao": "Qual ponto equidistante entre A(2,4) e B(6,8) representa corretamente o centro de uma circunferência que passa por ambos?",
+          "alternativa_escolhida": "Ponto M (4,5)",
+          "alternativa_correta": "Ponto N (4,6)"
+        }
+      ],
+      "total_acertos": 8,
+      "total_erros": 2,
+      "notas_por_nivel": {
+        "Lembrar": 9.2,
+        "Compreender": 9.1,
+        "Aplicar": 7.2,
+        "Analisar": 6.6,
+        "Avaliar": 4.4,
+        "Criar": 3.8
+      }
+    }
+  }
+  

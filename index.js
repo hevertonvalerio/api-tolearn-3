@@ -24,6 +24,80 @@ app.use(cors());                        // Habilita CORS para todas as rotas
 const PORT = process.env.PORT || 3001;  // Porta do servidor (padrão: 3001)
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY }); // Inicializa o cliente Groq com a chave API
 const DEFAULT_SYSTEM_PROMPT = process.env.DEFAULT_SYSTEM_PROMPT || "Não responda nada fora do contexto de ciência da computação e programação."; // Prompt padrão do sistema
+const DEFAULT_REPORT_PROMPT = `
+Você é um especialista em educação e análise de desempenho acadêmico. 
+Utilize os dados a seguir para gerar um relatório humanizado e pedagógico a respeito do desempenho do aluno em um Estudo Dirigido Obrigatório (EDO), de acordo com a seguinte estrutura:
+
+1. Análise Geral do Desempenho
+2. Pontos Fortes
+3. Dificuldades Encontradas
+4. Recomendações ao Professor
+5. Conclusão
+
+Regras de saída esperada:
+* Use linguagem pedagógica, humanizada e objetiva.
+* A análise deve reconhecer acertos, destacar potenciais e explicar com empatia as dificuldades.
+* A seção de recomendações deve ser útil para o professor saber como apoiar o aluno nos próximos desafios.
+* A conclusão deve reforçar o estágio atual do aluno e seu potencial de progresso.
+
+Formato final: texto corrido estruturado nos 5 blocos mencionados, sem tópicos numéricos no corpo, mas respeitando os títulos. 
+O conteúdo deve ser exclusivo para este aluno, considerando apenas a tentativa com a maior nota.
+    
+Inicie o relatório com:
+🧠 RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
+`; // Prompt padrão para relatórios
+
+// Variável para armazenar o prompt do sistema atual em memória
+let currentSystemPrompt = DEFAULT_SYSTEM_PROMPT;
+let currentReportPrompt = DEFAULT_REPORT_PROMPT;
+
+// Rota para obter o prompt de sistema atual
+app.get("/api/config/system-prompt", (req, res) => {
+  res.json({ prompt: currentSystemPrompt });
+});
+
+// Rota para atualizar o prompt de sistema
+app.put("/api/config/system-prompt", (req, res) => {
+  const { prompt } = req.body;
+  
+  if (!prompt || prompt.trim() === "") {
+    return res.status(400).json({ error: "Prompt de sistema não fornecido!" });
+  }
+  
+  // Atualiza a variável em memória
+  currentSystemPrompt = prompt.trim();
+  console.log("Prompt do sistema atualizado para:", currentSystemPrompt);
+  
+  res.json({ 
+    success: true, 
+    prompt: currentSystemPrompt,
+    message: "Prompt de sistema atualizado com sucesso!" 
+  });
+});
+
+// Rota para obter o prompt de relatório atual
+app.get("/api/config/report-prompt", (req, res) => {
+  res.json({ prompt: currentReportPrompt });
+});
+
+// Rota para atualizar o prompt de relatório
+app.put("/api/config/report-prompt", (req, res) => {
+  const { prompt } = req.body;
+  
+  if (!prompt || prompt.trim() === "") {
+    return res.status(400).json({ error: "Prompt de relatório não fornecido!" });
+  }
+  
+  // Atualiza a variável em memória
+  currentReportPrompt = prompt.trim();
+  console.log("Prompt de relatório atualizado para:", currentReportPrompt);
+  
+  res.json({ 
+    success: true, 
+    prompt: currentReportPrompt,
+    message: "Prompt de relatório atualizado com sucesso!" 
+  });
+});
 
 // Configuração do Swagger para documentação da API
 const swaggerOptions = {
@@ -88,32 +162,43 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *         description: Prompt não fornecido
  */
 
-// Variável para armazenar o prompt do sistema atual em memória
-let currentSystemPrompt = DEFAULT_SYSTEM_PROMPT;
-
-// Rota para obter o prompt de sistema atual
-app.get("/api/config/system-prompt", (req, res) => {
-  res.json({ prompt: currentSystemPrompt });
-});
-
-// Rota para atualizar o prompt de sistema
-app.put("/api/config/system-prompt", (req, res) => {
-  const { prompt } = req.body;
-  
-  if (!prompt || prompt.trim() === "") {
-    return res.status(400).json({ error: "Prompt de sistema não fornecido!" });
-  }
-  
-  // Atualiza a variável em memória
-  currentSystemPrompt = prompt.trim();
-  console.log("Prompt do sistema atualizado para:", currentSystemPrompt);
-  
-  res.json({ 
-    success: true, 
-    prompt: currentSystemPrompt,
-    message: "Prompt de sistema atualizado com sucesso!" 
-  });
-});
+/**
+ * @swagger
+ * /api/config/report-prompt:
+ *   get:
+ *     summary: Obtém o prompt de relatório atual
+ *     tags: [Configuração]
+ *     responses:
+ *       200:
+ *         description: Prompt de relatório retornado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 prompt:
+ *                   type: string
+ *   put:
+ *     summary: Atualiza o prompt de relatório
+ *     tags: [Configuração]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - prompt
+ *             properties:
+ *               prompt:
+ *                 type: string
+ *                 description: Novo prompt de relatório para contextualizar o modelo
+ *     responses:
+ *       200:
+ *         description: Prompt de relatório atualizado com sucesso
+ *       400:
+ *         description: Prompt não fornecido
+ */
 
 /**
  * @swagger
@@ -279,29 +364,8 @@ app.post("/api/relatorio-edo", async (req, res) => {
   }
 
   try {
-    // Prompt do sistema com instruções detalhadas para a geração do relatório
-    const systemPrompt = `
-    Você é um especialista em educação e análise de desempenho acadêmico. 
-    Utilize os dados a seguir para gerar um relatório humanizado e pedagógico a respeito do desempenho do aluno em um Estudo Dirigido Obrigatório (EDO), de acordo com a seguinte estrutura:
-
-    1. Análise Geral do Desempenho
-    2. Pontos Fortes
-    3. Dificuldades Encontradas
-    4. Recomendações ao Professor
-    5. Conclusão
-
-    Regras de saída esperada:
-    * Use linguagem pedagógica, humanizada e objetiva.
-    * A análise deve reconhecer acertos, destacar potenciais e explicar com empatia as dificuldades.
-    * A seção de recomendações deve ser útil para o professor saber como apoiar o aluno nos próximos desafios.
-    * A conclusão deve reforçar o estágio atual do aluno e seu potencial de progresso.
-
-    Formato final: texto corrido estruturado nos 5 blocos mencionados, sem tópicos numéricos no corpo, mas respeitando os títulos. 
-    O conteúdo deve ser exclusivo para este aluno, considerando apenas a tentativa com a maior nota.
-    
-    Inicie o relatório com:
-    🧠 RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
-    `;
+    // Usa o prompt dinâmico para relatórios
+    const systemPrompt = currentReportPrompt;
 
     // Prompt do usuário com os dados para gerar o relatório
     const userPrompt = `
@@ -400,29 +464,8 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
   }
 
   try {
-    // Prompt do sistema com instruções detalhadas para a geração do relatório
-    const systemPrompt = `
-    Você é um especialista em educação e análise de desempenho acadêmico. 
-    Utilize os dados a seguir para gerar um relatório humanizado e pedagógico a respeito do desempenho do aluno em um Estudo Dirigido Obrigatório (EDO), de acordo com a seguinte estrutura:
-
-    1. Análise Geral do Desempenho
-    2. Pontos Fortes
-    3. Dificuldades Encontradas
-    4. Recomendações ao Professor
-    5. Conclusão
-
-    Regras de saída esperada:
-    * Use linguagem pedagógica, humanizada e objetiva.
-    * A análise deve reconhecer acertos, destacar potenciais e explicar com empatia as dificuldades.
-    * A seção de recomendações deve ser útil para o professor saber como apoiar o aluno nos próximos desafios.
-    * A conclusão deve reforçar o estágio atual do aluno e seu potencial de progresso.
-
-    Formato final: texto corrido estruturado nos 5 blocos mencionados, sem tópicos numéricos no corpo, mas respeitando os títulos. 
-    O conteúdo deve ser exclusivo para este aluno, considerando apenas a tentativa com a maior nota.
-    
-    Inicie o relatório com:
-    🧠 RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
-    `;
+    // Usa o prompt dinâmico para relatórios
+    const systemPrompt = currentReportPrompt;
 
     // Prompt do usuário com os dados para gerar o relatório
     const userPrompt = `
