@@ -17,44 +17,63 @@ import PDFDocument from "pdfkit"; // Biblioteca para geração de PDFs
 // Inicialização e configuração do aplicativo Express
 const app = express();
 app.use(express.json());                // Middleware para processar JSON no corpo das requisições
-app.use(cors());                        // Habilita CORS para todas as rotas/api/config/report-prompt
+app.use(cors());                        // Habilita CORS para todas as rotas
 
 // Configurações e variáveis de ambiente
-const PORT = process.env.PORT || 3002;  // Porta do servidor (padrão: 3001)
+const PORT = process.env.PORT || 3002;  // Porta do servidor (padrão: 3002)
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY }); // Inicializa o cliente Groq com a chave API
 const DEFAULT_SYSTEM_PROMPT = process.env.DEFAULT_SYSTEM_PROMPT || "Não responda nada fora do contexto de ciência da computação e programação."; // Prompt padrão do sistema
-const DEFAULT_REPORT_PROMPT = `Você é um assistente educacional especializado em análise de desempenho acadêmico.
-Sua tarefa é gerar um relatório detalhado e humanizado sobre o desempenho do aluno em uma Experiência Digital de Observação (EDO).
 
-Siga estas diretrizes:
-1. Use linguagem clara, pedagógica e acolhedora
-2. Evite jargões técnicos excessivos
-3. Estruture o relatório em seções bem definidas
-4. Destaque pontos fortes e áreas para melhoria
-5. Ofereça sugestões práticas de estudo
-6. Mantenha um tom construtivo e motivador
-7. Use formatação Markdown para melhor legibilidade
-8. Inclua um título atrativo para o relatório
+// Prompt aprimorado para relatórios EDO baseado no exemplo fornecido
+const DEFAULT_REPORT_PROMPT = `Você é um assistente educacional especializado em análise de desempenho acadêmico para EDOs (Estudos Dirigidos Obrigatórios).
 
-IMPORTANTE: O relatório será exibido abaixo de seções estruturadas que já mostram:
-- Um resumo inicial com dados do aluno, da EDO e métricas gerais
-- Uma tabela de desempenho cognitivo com notas por nível da taxonomia de Bloom
-- Uma lista de questões respondidas incorretamente
+Sua tarefa é gerar um relatório detalhado, humanizado e pedagógico seguindo EXATAMENTE esta estrutura e formato:
 
-Portanto, seu relatório deve COMPLEMENTAR estas informações já exibidas, não as repetir. Concentre-se em:
-- Uma introdução personalizada e acolhedora
-- Análise qualitativa do desempenho (não apenas números)
-- Interpretação pedagógica dos resultados por nível cognitivo
-- Padrões identificados nos erros cometidos
-- Estratégias específicas de estudo baseadas nas dificuldades
-- Pontos fortes a serem celebrados
-- Conclusão motivacional e encorajadora
+RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
 
-Lembre-se: este relatório será lido por educadores e pelo próprio aluno, então equilibre honestidade com encorajamento.
+1. Análise Geral do Desempenho
+[Análise qualitativa do desempenho geral, destacando a trajetória do aluno, pontos fortes conceituais, e capacidade de progressão pelos níveis da taxonomia de Bloom. Mencione a nota final e contextualize-a.]
 
-Inicie o relatório com:
-🧠 RELATÓRIO DETALHADO POR IA — [Nome do Aluno]
-`; // Prompt padrão para relatórios
+2. Pontos Fortes
+[Liste e detalhe os principais pontos fortes identificados, como:
+• Domínio de conteúdos específicos
+• Capacidade de aprendizado com erros
+• Agilidade em determinados níveis
+• Estratégias eficazes utilizadas
+Sempre use bullet points (•) para organizar as informações.]
+
+3. Dificuldades Encontradas
+[Analise especificamente as questões erradas, identificando:
+• Padrões de erro por nível da taxonomia
+• Dificuldades conceituais específicas
+• Áreas que precisam de reforço
+• Tipos de raciocínio que apresentam desafios
+Sempre conecte os erros aos níveis cognitivos correspondentes.]
+
+4. Recomendações ao Professor
+[Forneça sugestões práticas e específicas para:
+• Estratégias pedagógicas direcionadas
+• Recursos didáticos recomendados
+• Atividades complementares
+• Métodos de avaliação alternativos
+Use bullet points (•) para organizar as recomendações.]
+
+5. Conclusão
+[Finalize com uma visão prospectiva e encorajadora, destacando o potencial do aluno e as próximas etapas de desenvolvimento. Mantenha um tom motivacional e construtivo.]
+
+DIRETRIZES IMPORTANTES:
+- Use linguagem clara, pedagógica e acolhedora
+- Mantenha tom construtivo e motivador
+- Seja específico nas análises, citando níveis da taxonomia de Bloom
+- Conecte erros a conceitos pedagógicos
+- Ofereça sugestões práticas e aplicáveis
+- Use formatação Markdown consistente
+- Evite repetir informações já apresentadas no resumo estruturado
+- Foque na análise qualitativa, não apenas números
+- Personalize para o aluno específico usando o nome dele
+- NÃO use emojis no relatório - apenas texto simples e formatação markdown
+
+O relatório deve complementar (não repetir) as informações já exibidas nas seções estruturadas anteriores.`; 
 
 // Variável para armazenar o prompt do sistema atual em memória
 let currentSystemPrompt = DEFAULT_SYSTEM_PROMPT;
@@ -242,6 +261,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *       500:
  *         description: Erro ao consultar a API do Groq
  */
+
 /**
  * Função utilitária para interagir com a API da Groq
  * 
@@ -315,11 +335,15 @@ app.post("/api/chat", async (req, res) => {
  *                 properties:
  *                   nome_aluno:
  *                     type: string
- *                   disciplina:
+ *                   ra:
  *                     type: string
  *                   turma:
  *                     type: string
  *                   serie:
+ *                     type: string
+ *                   disciplina:
+ *                     type: string
+ *                   professor:
  *                     type: string
  *                   tema_edo:
  *                     type: string
@@ -339,12 +363,36 @@ app.post("/api/chat", async (req, res) => {
  *                     type: array
  *                     items:
  *                       type: object
+ *                       properties:
+ *                         numero:
+ *                           type: integer
+ *                         nivel:
+ *                           type: string
+ *                         texto_questao:
+ *                           type: string
+ *                         alternativa_escolhida:
+ *                           type: string
+ *                         alternativa_correta:
+ *                           type: string
  *                   total_acertos:
  *                     type: integer
  *                   total_erros:
  *                     type: integer
  *                   notas_por_nivel:
  *                     type: object
+ *                     properties:
+ *                       Lembrar:
+ *                         type: number
+ *                       Compreender:
+ *                         type: number
+ *                       Aplicar:
+ *                         type: number
+ *                       Analisar:
+ *                         type: number
+ *                       Avaliar:
+ *                         type: number
+ *                       Criar:
+ *                         type: number
  *     responses:
  *       200:
  *         description: Relatório gerado com sucesso
@@ -360,6 +408,7 @@ app.post("/api/chat", async (req, res) => {
  *       500:
  *         description: Erro ao gerar o relatório
  */
+
 /**
  * Rota para geração de relatório EDO (Estudo Dirigido Obrigatório)
  * Recebe dados do aluno e do EDO e retorna um relatório detalhado gerado pela IA
@@ -376,17 +425,59 @@ app.post("/api/relatorio-edo", async (req, res) => {
     // Usa o prompt dinâmico para relatórios
     const systemPrompt = currentReportPrompt;
 
-    // Prompt do usuário com os dados para gerar o relatório
+    // Cria um prompt estruturado com os dados para análise
     const userPrompt = `
-    Gere um relatório detalhado para os seguintes dados:
-    ${JSON.stringify(dados, null, 2)}
+Analise os seguintes dados de desempenho do aluno e gere um relatório pedagógico detalhado:
+
+**DADOS DO ALUNO:**
+- Nome: ${dados.nome_aluno}
+- RA: ${dados.ra || 'Não informado'}
+- Turma: ${dados.turma || 'Não informada'}
+- Série: ${dados.serie || 'Não informada'}
+
+**DADOS DO EDO:**
+- Disciplina: ${dados.disciplina}
+- Professor: ${dados.professor || 'Não informado'}
+- Tema: ${dados.tema_edo}
+- Nota Final: ${dados.nota_edo}
+- Data/Hora Início: ${dados.data_inicio}
+- Data/Hora Término: ${dados.data_termino}
+- Tempo Total: ${dados.tempo_total_execucao}
+- Tempo Médio por Questão: ${dados.tempo_medio_questao}
+- Nível Máximo Alcançado: ${dados.nivel_maximo_taxonomia}
+
+**DESEMPENHO POR NÍVEL COGNITIVO:**
+${dados.notas_por_nivel ? Object.entries(dados.notas_por_nivel)
+  .map(([nivel, nota]) => `- ${nivel}: ${nota} pontos`)
+  .join('\n') : 'Dados não disponíveis'}
+
+**ANÁLISE DE ERROS:**
+Total de Acertos: ${dados.total_acertos || 'Não informado'}
+Total de Erros: ${dados.total_erros || 'Não informado'}
+
+**QUESTÕES RESPONDIDAS INCORRETAMENTE:**
+${dados.questoes_erradas && dados.questoes_erradas.length > 0 
+  ? dados.questoes_erradas.map((questao, index) => `
+${index + 1}. ${questao.nivel} - ${questao.texto_questao}
+   • Resposta do aluno: ${questao.alternativa_escolhida}
+   • Resposta correta: ${questao.alternativa_correta}
+`).join('\n')
+  : 'Nenhuma questão respondida incorretamente.'}
+
+**CONTEXTO ADICIONAL:**
+- Performance geral demonstrada pelos dados numéricos
+- Padrões de erro identificados
+- Progressão através dos níveis da taxonomia de Bloom
+- Tempo investido na atividade
+
+Gere um relatório que analise esses dados de forma pedagógica, destacando insights educacionais relevantes para professores e o próprio aluno.
     `;
 
     // Envia os prompts para a API da Groq e aguarda a resposta
     const responseGroq = await getGroqChatCompletion(userPrompt, systemPrompt);
     const relatorio = responseGroq.choices[0]?.message.content || "";
 
-    console.log("Relatório gerado com sucesso!");
+    console.log("Relatório EDO gerado com sucesso para:", dados.nome_aluno);
 
     // Retorna o relatório gerado como JSON
     res.json({ relatorio });
@@ -417,11 +508,15 @@ app.post("/api/relatorio-edo", async (req, res) => {
  *                 properties:
  *                   nome_aluno:
  *                     type: string
- *                   disciplina:
+ *                   ra:
  *                     type: string
  *                   turma:
  *                     type: string
  *                   serie:
+ *                     type: string
+ *                   disciplina:
+ *                     type: string
+ *                   professor:
  *                     type: string
  *                   tema_edo:
  *                     type: string
@@ -460,6 +555,7 @@ app.post("/api/relatorio-edo", async (req, res) => {
  *       500:
  *         description: Erro ao gerar o relatório
  */
+
 /**
  * Rota para geração de relatório EDO em formato PDF
  * Recebe dados do aluno e do EDO, gera um relatório detalhado e retorna como PDF para download
@@ -473,24 +569,57 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
   }
 
   try {
-    // Usa o prompt dinâmico para relatórios
+    // Primeiro, gera o relatório usando a IA
     const systemPrompt = currentReportPrompt;
-
-    // Prompt do usuário com os dados para gerar o relatório
     const userPrompt = `
-    Gere um relatório detalhado para os seguintes dados:
-    ${JSON.stringify(dados, null, 2)}
+Analise os seguintes dados de desempenho do aluno e gere um relatório pedagógico detalhado:
+
+**DADOS DO ALUNO:**
+- Nome: ${dados.nome_aluno}
+- RA: ${dados.ra || 'Não informado'}
+- Turma: ${dados.turma || 'Não informada'}
+- Série: ${dados.serie || 'Não informada'}
+
+**DADOS DO EDO:**
+- Disciplina: ${dados.disciplina}
+- Professor: ${dados.professor || 'Não informado'}
+- Tema: ${dados.tema_edo}
+- Nota Final: ${dados.nota_edo}
+- Data/Hora Início: ${dados.data_inicio}
+- Data/Hora Término: ${dados.data_termino}
+- Tempo Total: ${dados.tempo_total_execucao}
+- Tempo Médio por Questão: ${dados.tempo_medio_questao}
+- Nível Máximo Alcançado: ${dados.nivel_maximo_taxonomia}
+
+**DESEMPENHO POR NÍVEL COGNITIVO:**
+${dados.notas_por_nivel ? Object.entries(dados.notas_por_nivel)
+  .map(([nivel, nota]) => `- ${nivel}: ${nota} pontos`)
+  .join('\n') : 'Dados não disponíveis'}
+
+**ANÁLISE DE ERROS:**
+Total de Acertos: ${dados.total_acertos || 'Não informado'}
+Total de Erros: ${dados.total_erros || 'Não informado'}
+
+**QUESTÕES RESPONDIDAS INCORRETAMENTE:**
+${dados.questoes_erradas && dados.questoes_erradas.length > 0 
+  ? dados.questoes_erradas.map((questao, index) => `
+${index + 1}. ${questao.nivel} - ${questao.texto_questao}
+   • Resposta do aluno: ${questao.alternativa_escolhida}
+   • Resposta correta: ${questao.alternativa_correta}
+`).join('\n')
+  : 'Nenhuma questão respondida incorretamente.'}
+
+Gere um relatório que analise esses dados de forma pedagógica, destacando insights educacionais relevantes.
     `;
 
-    // Envia os prompts para a API da Groq e aguarda a resposta
     const responseGroq = await getGroqChatCompletion(userPrompt, systemPrompt);
     const relatorio = responseGroq.choices[0]?.message.content || "";
 
-    console.log("Gerando PDF do relatório...");
+    console.log("Gerando PDF do relatório para:", dados.nome_aluno);
 
     // Configurando o cabeçalho para download do PDF
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=relatorio-${dados.nome_aluno.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+    res.setHeader('Content-Disposition', `attachment; filename=relatorio-edo-${dados.nome_aluno.replace(/\s+/g, '-').toLowerCase()}.pdf`);
 
     // Criando o documento PDF com metadados
     const doc = new PDFDocument({ 
@@ -499,7 +628,8 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
       info: {
         Title: `Relatório EDO - ${dados.nome_aluno}`,
         Author: 'ToLearn - Plataforma de Ensino',
-        Subject: `Relatório de desempenho em ${dados.disciplina} - ${dados.tema_edo}`
+        Subject: `Relatório de desempenho em ${dados.disciplina} - ${dados.tema_edo}`,
+        Creator: 'ToLearn IA System'
       }
     });
 
@@ -513,169 +643,225 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
     
     doc.fillColor('#000')
        .fontSize(16)
+       .font('Helvetica-Bold')
        .text('ToLearn', 60, 65);
 
     // Cabeçalho do relatório
     doc.moveDown(2)
        .fontSize(22)
        .font('Helvetica-Bold')
-       .text('Relatório Detalhado de Desempenho', { align: 'center' });
+       .text('📊 RELATÓRIO DE AVALIAÇÃO DO EDO', { align: 'center' });
     
-    doc.moveDown(0.5)
-       .fontSize(16)
-       .text(`Aluno: ${dados.nome_aluno}`, { align: 'center' });
-    
-    // Seção de resumo inicial com ícones
+    // Seção de dados do aluno
     doc.moveDown(1.5)
        .fontSize(16)
        .font('Helvetica-Bold')
-       .text('📊 RELATÓRIO DE AVALIAÇÃO DO EDO');
+       .text('👤 Dados do Aluno');
     
     doc.moveDown(0.5)
        .fontSize(12)
        .font('Helvetica')
-       .text(`👤 Dados do Aluno: Nome: ${dados.nome_aluno}, RA: ${dados.ra || 'N/A'}, Turma: ${dados.turma}`)
-       .moveDown(0.3)
-       .text(`📘 Dados da EDO: Disciplina: ${dados.disciplina}, Professor: ${dados.professor || 'N/A'}, Tema: ${dados.tema_edo}`)
-       .moveDown(0.3)
-       .text(`⏱️ Tempo Total: ${dados.tempo_total_execucao} (média/questão: ${dados.tempo_medio_questao})`)
-       .moveDown(0.3)
-       .text(`🌡️ Nível Máximo Alcançado: ${dados.nivel_maximo_taxonomia}`);
+       .text(`• Nome: ${dados.nome_aluno}`)
+       .text(`• RA: ${dados.ra || 'N/A'}`)
+       .text(`• Turma: ${dados.turma || 'N/A'}`);
+
+    // Seção de dados do EDO
+    doc.moveDown(1)
+       .fontSize(16)
+       .font('Helvetica-Bold')
+       .text('📘 Dados do Estudo Dirigido Obrigatório');
+    
+    doc.moveDown(0.5)
+       .fontSize(12)
+       .font('Helvetica')
+       .text(`• Disciplina: ${dados.disciplina}`)
+       .text(`• Professor responsável: ${dados.professor || 'N/A'}`)
+       .text(`• Tema: ${dados.tema_edo}`)
+       .text(`• Data e hora de início: ${dados.data_inicio}`)
+       .text(`• Data e hora de término: ${dados.data_termino}`)
+       .text(`• Tempo total de execução: ${dados.tempo_total_execucao}`)
+       .text(`• Tempo médio por questão: ${dados.tempo_medio_questao}`);
 
     // Seção de desempenho cognitivo
     doc.moveDown(1)
-       .fontSize(14)
+       .fontSize(16)
        .font('Helvetica-Bold')
        .text('🧠 Desempenho Cognitivo (Taxonomia de Bloom)');
     
-    // Tabela de desempenho
+    // Tabela de desempenho simplificada
     if (dados.notas_por_nivel) {
-      const niveis = Object.keys(dados.notas_por_nivel);
-      const startY = doc.y + 15;
-      const colWidth = 250;
-      
-      // Cabeçalho da tabela
-      doc.font('Helvetica-Bold')
-         .fontSize(12)
-         .text('Nível', 50, startY)
-         .text('Nota', 50 + colWidth, startY);
-      
-      // Linhas da tabela
-      let rowY = startY + 20;
-      niveis.forEach(nivel => {
-        doc.font('Helvetica')
-           .text(nivel, 50, rowY)
-           .text(dados.notas_por_nivel[nivel].toString(), 50 + colWidth, rowY);
-        rowY += 20;
+      doc.moveDown(0.5);
+      Object.entries(dados.notas_por_nivel).forEach(([nivel, nota]) => {
+        doc.fontSize(12)
+           .font('Helvetica')
+           .text(`• ${nivel}: ${nota} pts`);
       });
-      
-      doc.y = rowY + 10;
     }
+
+    // Nota final
+    doc.moveDown(1)
+       .fontSize(16)
+       .font('Helvetica-Bold')
+       .text('🟢 Nota Final do EDO');
+    
+    doc.moveDown(0.5)
+       .fontSize(14)
+       .font('Helvetica')
+       .text(`${dados.tema_edo} = ${dados.nota_edo} pontos`);
 
     // Seção de questões erradas
-    doc.moveDown(1)
-       .fontSize(14)
-       .font('Helvetica-Bold')
-       .text('❌ Questões com Erro');
-    
     if (dados.questoes_erradas && dados.questoes_erradas.length > 0) {
+      doc.moveDown(1)
+         .fontSize(16)
+         .font('Helvetica-Bold')
+         .text('❌ Questões com Erro');
+      
       doc.moveDown(0.5);
       dados.questoes_erradas.forEach((questao, index) => {
-        doc.font('Helvetica-Bold')
+        doc.fontSize(14)
+           .font('Helvetica-Bold')
+           .text(`${index + 1}. ${questao.nivel} - Nível ${questao.nivel}`);
+        
+        doc.moveDown(0.3)
            .fontSize(12)
-           .text(`Questão ${questao.numero} (${questao.nivel})`);
-        
-        doc.moveDown(0.3)
            .font('Helvetica')
-           .text(`❓ ${questao.texto_questao}`);
+           .text(`Enunciado: ${questao.texto_questao}`, { 
+             align: 'justify',
+             width: 500
+           });
         
         doc.moveDown(0.3)
-           .text(`• Alternativa escolhida: ${questao.alternativa_escolhida}`);
+           .text(`Alternativa selecionada pelo aluno: ${questao.alternativa_escolhida}`);
         
         doc.moveDown(0.3)
-           .text(`• Alternativa correta: ${questao.alternativa_correta}`);
+           .text(`Alternativa correta: ${questao.alternativa_correta}`);
         
         if (index < dados.questoes_erradas.length - 1) {
-          doc.moveDown(0.5);
+          doc.moveDown(0.8);
         }
       });
-    } else {
-      doc.moveDown(0.5)
-         .font('Helvetica')
-         .fontSize(12)
-         .text('Nenhuma questão respondida incorretamente.');
     }
 
-    // Divisor
+    // Nível máximo alcançado
     doc.moveDown(1)
-       .strokeColor('#aaaaaa')
-       .lineWidth(1)
+       .fontSize(16)
+       .font('Helvetica-Bold')
+       .text('Nível Máximo Alcançado');
+    
+    doc.moveDown(0.5)
+       .fontSize(12)
+       .font('Helvetica')
+       .text(`• Taxonomia mais alta atingida com sucesso: ${dados.nivel_maximo_taxonomia}`);
+
+    // Divisor antes do relatório da IA
+    doc.moveDown(1.5)
+       .strokeColor('#4CAF50')
+       .lineWidth(2)
        .moveTo(50, doc.y)
        .lineTo(550, doc.y)
        .stroke();
 
-    // Conteúdo do relatório
+    // Título do relatório detalhado
     doc.moveDown(1)
+       .fontSize(16)
+       .font('Helvetica-Bold')
+       .fillColor('#000')
+       .text(`RELATÓRIO DETALHADO POR IA — ${dados.nome_aluno}`);
+
+    // Relatório detalhado da IA
+    doc.moveDown(0.5)
        .fontSize(12)
        .font('Helvetica');
 
-    // Processando o relatório linha por linha para formatação adequada
+    // Processando o relatório da IA linha por linha para formatação adequada
     const linhas = relatorio.split('\n');
     let emTitulo = false;
 
     for (let linha of linhas) {
-      // Se for um título (1., 2., etc. ou começar com emoji)
-      if (linha.match(/^\d+\.\s/) || linha.match(/^🧠/) || linha.match(/^✅/) || linha.match(/^❌/) || linha.match(/^🧭/) || linha.match(/^✅/)) {
-        emTitulo = true;
-        doc.moveDown(0.5)
+      linha = linha.trim();
+      
+      if (!linha) {
+        doc.moveDown(0.3);
+        continue;
+      }
+
+      // Detecta títulos principais (com números e texto específico)
+      if (linha.match(/^RELATÓRIO.*—/) || 
+          linha.match(/^\d+\.\s*(Análise|Pontos|Dificuldades|Recomendações|Conclusão)/) ||
+          linha.includes('Análise Geral') ||
+          linha.includes('Pontos Fortes') ||
+          linha.includes('Dificuldades Encontradas') ||
+          linha.includes('Recomendações') ||
+          linha.includes('Conclusão')) {
+        
+        doc.moveDown(0.8)
            .font('Helvetica-Bold')
            .fontSize(14)
            .text(linha);
-      } else if (linha.trim() === '') {
-        doc.moveDown(0.5);
-      } else {
+        emTitulo = true;
+      }
+      // Detecta bullet points
+      else if (linha.startsWith('•') || linha.startsWith('-')) {
+        doc.moveDown(0.3)
+           .font('Helvetica')
+           .fontSize(11)
+           .text(linha, { 
+             indent: 20,
+             align: 'justify',
+             width: 480
+           });
+      }
+      // Texto normal
+      else {
         if (emTitulo) {
-          emTitulo = false;
           doc.moveDown(0.5);
+          emTitulo = false;
+        } else {
+          doc.moveDown(0.2);
         }
+        
         doc.font('Helvetica')
-           .fontSize(12)
+           .fontSize(11)
            .text(linha, {
              align: 'justify',
-             lineGap: 2
+             lineGap: 1,
+             width: 500
            });
       }
     }
 
-    // Rodapé na página atual
+    // Rodapé
+    const currentY = doc.y;
+    const pageHeight = doc.page.height;
+    
+    // Se não há espaço suficiente para o rodapé, adiciona uma nova página
+    if (currentY > pageHeight - 100) {
+      doc.addPage();
+    }
+
+    // Posiciona o rodapé no final da página
+    doc.y = pageHeight - 80;
+    
     // Linha divisória no rodapé
     doc.strokeColor('#aaaaaa')
        .lineWidth(1)
-       .moveTo(50, 750)
-       .lineTo(550, 750)
+       .moveTo(50, doc.y)
+       .lineTo(550, doc.y)
        .stroke();
     
     // Texto do rodapé
     doc.fontSize(10)
        .fillColor('#555555')
        .text(
-         `Relatório gerado automaticamente por ToLearn IA | ${new Date().toLocaleDateString('pt-BR')}`,
+         `Relatório gerado automaticamente por ToLearn IA | ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`,
          50,
-         760,
+         doc.y + 10,
          { align: 'center' }
        );
-    
-    // Número da página - vamos apenas adicionar na página atual
-    doc.text(
-      `Página 1`,
-      50,
-      760,
-      { align: 'right' }
-    );
 
     // Finalizando o PDF
     doc.end();
-    console.log("PDF gerado com sucesso!");
+    console.log("PDF gerado com sucesso para:", dados.nome_aluno);
     
   } catch (error) {
     // Tratamento de erro
@@ -685,9 +871,75 @@ app.post("/api/relatorio-edo/pdf", async (req, res) => {
 });
 
 /**
+ * Rota para teste de saúde da API
+ */
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "OK", 
+    timestamp: new Date().toISOString(),
+    service: "ToLearn Groq Integration API"
+  });
+});
+
+/**
+ * Rota para informações da API
+ */
+app.get("/", (req, res) => {
+  res.json({
+    message: "API ToLearn - Integração Groq",
+    version: "1.0.0",
+    endpoints: {
+      chat: "POST /api/chat",
+      relatorio: "POST /api/relatorio-edo",
+      relatorioPDF: "POST /api/relatorio-edo/pdf",
+      systemPrompt: "GET/PUT /api/config/system-prompt",
+      reportPrompt: "GET/PUT /api/config/report-prompt",
+      docs: "GET /api-docs",
+      health: "GET /health"
+    },
+    documentation: `http://localhost:${PORT}/api-docs`
+  });
+});
+
+/**
+ * Middleware para tratamento de rotas não encontradas
+ */
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: "Rota não encontrada", 
+    message: `A rota ${req.method} ${req.path} não existe.`,
+    availableEndpoints: [
+      "GET /",
+      "GET /health", 
+      "GET /api-docs",
+      "POST /api/chat",
+      "POST /api/relatorio-edo",
+      "POST /api/relatorio-edo/pdf",
+      "GET /api/config/system-prompt",
+      "PUT /api/config/system-prompt",
+      "GET /api/config/report-prompt",
+      "PUT /api/config/report-prompt"
+    ]
+  });
+});
+
+/**
+ * Middleware para tratamento de erros globais
+ */
+app.use((error, req, res, next) => {
+  console.error("Erro não tratado:", error);
+  res.status(500).json({ 
+    error: "Erro interno do servidor",
+    message: "Ocorreu um erro inesperado. Verifique os logs do servidor."
+  });
+});
+
+/**
  * Inicia o servidor na porta especificada
  */
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-  console.log(`Documentação Swagger disponível em: http://localhost:${PORT}/api-docs`);
+  console.log(`🚀 Servidor ToLearn rodando na porta ${PORT}`);
+  console.log(`📚 Documentação Swagger disponível em: http://localhost:${PORT}/api-docs`);
+  console.log(`💡 Endpoint principal: http://localhost:${PORT}/api/relatorio-edo`);
+  console.log(`🔧 Configuração de prompts: http://localhost:${PORT}/api/config/`);
 });
