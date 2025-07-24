@@ -1,0 +1,93 @@
+{
+  "dados": {
+    "turma": "3ºC",
+    "serie": "3º ano do Ensino Médio",
+    "disciplina": "Física",
+    "professor": "Roberto Almeida Neto",
+    "periodo": "3º Bimestre - 2025",
+    "tema_edo": "Eletromagnetismo",
+    "data_inicio": "2025-06-08",
+    "data_termino": "2025-06-22",
+    "total_alunos": 32,
+    "media_geral": 5.3,
+    "tempo_medio_execucao": "00:38:45",
+    "nivel_maximo_taxonomia": "Analisar / Médio",
+    "distribuicao_notas": {
+      "excelente": 2,
+      "bom": 8,
+      "regular": 15,
+      "insuficiente": 7
+    },
+    "desempenho_por_nivel": {
+      "Lembrar": 7.2,
+      "Compreender": 6.5,
+      "Aplicar": 5.8,
+      "Analisar": 4.6,
+      "Avaliar": 3.8,
+      "Criar": 2.5
+    },
+    "questoes_problematicas": [
+      {
+        "numero": 3,
+        "nivel": "Compreender / Médio",
+        "texto_questao": "Explique a relação entre campo elétrico e campo magnético nas ondas eletromagnéticas.",
+        "taxa_erro": 65,
+        "alternativa_correta": "São perpendiculares entre si e à direção de propagação da onda, oscilando em fase."
+      },
+      {
+        "numero": 5,
+        "nivel": "Aplicar / Médio",
+        "texto_questao": "Um condutor retilíneo percorrido por uma corrente elétrica de 5A está submetido a um campo magnético de 0,2T. Calcule a força magnética sobre esse condutor se seu comprimento é de 30cm e forma um ângulo de 90° com o campo.",
+        "taxa_erro": 72,
+        "alternativa_correta": "F = 0,3N"
+      },
+      {
+        "numero": 7,
+        "nivel": "Analisar / Difícil",
+        "texto_questao": "Analise o funcionamento de um motor elétrico CC e explique como a força magnética produz o movimento de rotação.",
+        "taxa_erro": 80,
+        "alternativa_correta": "A força magnética sobre o condutor percorrido por corrente gera um torque, causando rotação contínua ao inverter periodicamente o sentido da corrente com o comutador."
+      }
+    ],
+    "alunos_destacados": {
+      "melhores_desempenhos": [
+        {
+          "nome": "Mateus Oliveira Santos",
+          "nota": 8.8,
+          "tempo_execucao": "00:29:45"
+        },
+        {
+          "nome": "Laura Pereira Castro",
+          "nota": 8.5,
+          "tempo_execucao": "00:31:20"
+        }
+      ],
+      "necessitam_atencao": [
+        {
+          "nome": "Bruno Silva Rodrigues",
+          "nota": 3.5,
+          "tempo_execucao": "00:42:15",
+          "dificuldades": ["Aplicar", "Analisar", "Avaliar"]
+        },
+        {
+          "nome": "Carolina Ferreira Lima",
+          "nota": 3.8,
+          "tempo_execucao": "00:43:30",
+          "dificuldades": ["Aplicar", "Analisar", "Avaliar"]
+        },
+        {
+          "nome": "Leonardo Costa Martins",
+          "nota": 4.2,
+          "tempo_execucao": "00:40:55",
+          "dificuldades": ["Analisar", "Avaliar"]
+        },
+        {
+          "nome": "Amanda Santos Alves",
+          "nota": 4.5,
+          "tempo_execucao": "00:39:20",
+          "dificuldades": ["Analisar", "Avaliar"]
+        }
+      ]
+    }
+  }
+}

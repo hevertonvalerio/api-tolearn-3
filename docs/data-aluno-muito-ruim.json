@@ -1,0 +1,82 @@
+{
+  "dados": {
+    "nome_aluno": "Marcos Antonio Pereira",
+    "disciplina": "Biologia",
+    "turma": "2ºD",
+    "serie": "2º ano do Ensino Médio",
+    "tema_edo": "Genética Mendeliana",
+    "nota_edo": 3.2,
+    "data_inicio": "2025-06-09 08:15",
+    "data_termino": "2025-06-09 09:10",
+    "tempo_total_execucao": "00:55:42",
+    "tempo_medio_questao": "04:38",
+    "nivel_maximo_taxonomia": "Aplicar / Médio",
+    "distribuicao_notas": {
+      "excelente": 0,
+      "bom": 0,
+      "regular": 0,
+      "insuficiente": 1
+    },
+    "questoes_erradas": [
+      {
+        "numero": 1,
+        "nivel": "Lembrar / Fácil",
+        "texto_questao": "Qual é o significado da primeira lei de Mendel?",
+        "alternativa_escolhida": "Genes ligados ao sexo têm padrões distintos de herança",
+        "alternativa_correta": "Características são determinadas por pares de fatores que se segregam durante a formação dos gametas"
+      },
+      {
+        "numero": 2,
+        "nivel": "Compreender / Fácil",
+        "texto_questao": "O que representa um genótipo heterozigoto?",
+        "alternativa_escolhida": "Presença de dois alelos iguais para um gene",
+        "alternativa_correta": "Presença de alelos diferentes para um mesmo gene"
+      },
+      {
+        "numero": 3,
+        "nivel": "Compreender / Médio",
+        "texto_questao": "Explique a diferença entre genótipo e fenótipo.",
+        "alternativa_escolhida": "Genótipo é a aparência e fenótipo é a composição genética",
+        "alternativa_correta": "Genótipo é a composição genética e fenótipo é a manifestação física"
+      },
+      {
+        "numero": 5,
+        "nivel": "Aplicar / Fácil",
+        "texto_questao": "Em ervilhas, a semente amarela (A) é dominante sobre a verde (a). Se cruzarmos plantas Aa x aa, qual a probabilidade de obtermos sementes amarelas?",
+        "alternativa_escolhida": "25%",
+        "alternativa_correta": "50%"
+      },
+      {
+        "numero": 6,
+        "nivel": "Aplicar / Médio",
+        "texto_questao": "Em humanos, um casal onde ambos são heterozigotos para albinismo (condição recessiva) tem qual probabilidade de ter uma criança albina?",
+        "alternativa_escolhida": "50%",
+        "alternativa_correta": "25%"
+      },
+      {
+        "numero": 7,
+        "nivel": "Analisar / Médio",
+        "texto_questao": "Analise o heredograma de uma família onde ocorre uma doença autossômica recessiva e identifique quais indivíduos são certamente heterozigotos.",
+        "alternativa_escolhida": "Apenas os indivíduos afetados pela doença",
+        "alternativa_correta": "Pais não afetados de filhos afetados"
+      },
+      {
+        "numero": 9,
+        "nivel": "Analisar / Difícil",
+        "texto_questao": "Considerando um caso de codominância, como no sistema ABO de grupos sanguíneos, analise o resultado de um cruzamento entre indivíduos do tipo AB.",
+        "alternativa_escolhida": "Todos os filhos serão AB",
+        "alternativa_correta": "25% A, 50% AB e 25% B"
+      }
+    ],
+    "total_acertos": 3,
+    "total_erros": 7,
+    "notas_por_nivel": {
+      "Lembrar": 4.0,
+      "Compreender": 3.5,
+      "Aplicar": 3.0,
+      "Analisar": 2.5,
+      "Avaliar": 1.8,
+      "Criar": 0.0
+    }
+  }
+}

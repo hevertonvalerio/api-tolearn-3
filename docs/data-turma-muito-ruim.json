@@ -1,0 +1,115 @@
+{
+  "dados": {
+    "turma": "1ºD",
+    "serie": "1º ano do Ensino Médio",
+    "disciplina": "Química",
+    "professor": "Fernanda Silva Santos",
+    "periodo": "4º Bimestre - 2025",
+    "tema_edo": "Estequiometria e Cálculos Químicos",
+    "data_inicio": "2025-06-15",
+    "data_termino": "2025-06-29",
+    "total_alunos": 35,
+    "media_geral": 3.8,
+    "tempo_medio_execucao": "00:46:35",
+    "nivel_maximo_taxonomia": "Aplicar / Fácil",
+    "distribuicao_notas": {
+      "excelente": 0,
+      "bom": 3,
+      "regular": 12,
+      "insuficiente": 20
+    },
+    "desempenho_por_nivel": {
+      "Lembrar": 5.2,
+      "Compreender": 4.5,
+      "Aplicar": 3.6,
+      "Analisar": 2.8,
+      "Avaliar": 1.9,
+      "Criar": 1.2
+    },
+    "questoes_problematicas": [
+      {
+        "numero": 2,
+        "nivel": "Lembrar / Fácil",
+        "texto_questao": "Qual é a unidade de medida utilizada para expressar o número de Avogadro?",
+        "taxa_erro": 65,
+        "alternativa_correta": "mol⁻¹"
+      },
+      {
+        "numero": 4,
+        "nivel": "Compreender / Médio",
+        "texto_questao": "Explique o conceito de mol e sua importância nos cálculos químicos.",
+        "taxa_erro": 78,
+        "alternativa_correta": "É a unidade de quantidade de matéria do SI que contém 6,022 × 10²³ entidades elementares, permitindo relacionar massa e número de partículas."
+      },
+      {
+        "numero": 5,
+        "nivel": "Aplicar / Fácil",
+        "texto_questao": "Calcule a massa de 2 mols de CO₂. (Massas atômicas: C = 12 u, O = 16 u)",
+        "taxa_erro": 82,
+        "alternativa_correta": "88 g"
+      },
+      {
+        "numero": 6,
+        "nivel": "Aplicar / Médio",
+        "texto_questao": "Em uma reação de combustão, 16g de metano (CH₄) reagem completamente com oxigênio. Qual a massa de CO₂ produzida?",
+        "taxa_erro": 85,
+        "alternativa_correta": "44g"
+      },
+      {
+        "numero": 7,
+        "nivel": "Analisar / Médio",
+        "texto_questao": "Analise a equação 2KClO₃ → 2KCl + 3O₂ e determine a massa de oxigênio produzida a partir de 24,5g de KClO₃.",
+        "taxa_erro": 90,
+        "alternativa_correta": "9,6g"
+      },
+      {
+        "numero": 8,
+        "nivel": "Analisar / Difícil",
+        "texto_questao": "Uma amostra de carbonato de cálcio de 20g reagiu com ácido clorídrico em excesso. Analise a reação e calcule o volume de CO₂ liberado nas CNTP.",
+        "taxa_erro": 93,
+        "alternativa_correta": "4,48L"
+      }
+    ],
+    "alunos_destacados": {
+      "melhores_desempenhos": [
+        {
+          "nome": "Daniel Rodrigues Costa",
+          "nota": 7.2,
+          "tempo_execucao": "00:35:15"
+        }
+      ],
+      "necessitam_atencao": [
+        {
+          "nome": "Mariana Lima Oliveira",
+          "nota": 2.1,
+          "tempo_execucao": "00:50:30",
+          "dificuldades": ["Lembrar", "Compreender", "Aplicar", "Analisar"]
+        },
+        {
+          "nome": "Pedro Henrique Santos",
+          "nota": 2.3,
+          "tempo_execucao": "00:48:45",
+          "dificuldades": ["Lembrar", "Compreender", "Aplicar", "Analisar"]
+        },
+        {
+          "nome": "Gabriela Ferreira Silva",
+          "nota": 2.0,
+          "tempo_execucao": "00:51:20",
+          "dificuldades": ["Lembrar", "Compreender", "Aplicar", "Analisar"]
+        },
+        {
+          "nome": "Lucas Martins Alves",
+          "nota": 1.8,
+          "tempo_execucao": "00:53:40",
+          "dificuldades": ["Lembrar", "Compreender", "Aplicar", "Analisar"]
+        },
+        {
+          "nome": "Vitória Castro Pereira",
+          "nota": 1.5,
+          "tempo_execucao": "00:55:15",
+          "dificuldades": ["Lembrar", "Compreender", "Aplicar", "Analisar"]
+        }
+      ]
+    }
+  }
+}

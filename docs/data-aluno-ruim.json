@@ -1,0 +1,68 @@
+{
+  "dados": {
+    "nome_aluno": "Camila Rodrigues Lima",
+    "disciplina": "Química",
+    "turma": "3ºC",
+    "serie": "3º ano do Ensino Médio",
+    "tema_edo": "Equilíbrio Químico",
+    "nota_edo": 5.2,
+    "data_inicio": "2025-06-14 10:30",
+    "data_termino": "2025-06-14 11:15",
+    "tempo_total_execucao": "00:45:23",
+    "tempo_medio_questao": "03:47",
+    "nivel_maximo_taxonomia": "Analisar / Difícil",
+    "distribuicao_notas": {
+      "excelente": 0,
+      "bom": 0,
+      "regular": 1,
+      "insuficiente": 0
+    },
+    "questoes_erradas": [
+      {
+        "numero": 2,
+        "nivel": "Compreender / Fácil",
+        "texto_questao": "O que acontece com o equilíbrio químico quando aumentamos a temperatura de uma reação exotérmica?",
+        "alternativa_escolhida": "O equilíbrio desloca-se para a direita, favorecendo os produtos",
+        "alternativa_correta": "O equilíbrio desloca-se para a esquerda, favorecendo os reagentes"
+      },
+      {
+        "numero": 4,
+        "nivel": "Aplicar / Médio",
+        "texto_questao": "Calcule a constante de equilíbrio para a reação N₂ + 3H₂ ⇌ 2NH₃ se as concentrações no equilíbrio são [N₂] = 0,2 M, [H₂] = 0,4 M e [NH₃] = 0,6 M.",
+        "alternativa_escolhida": "K = 28,125",
+        "alternativa_correta": "K = 56,25"
+      },
+      {
+        "numero": 6,
+        "nivel": "Analisar / Médio",
+        "texto_questao": "Analise o efeito da adição de um catalisador no equilíbrio químico.",
+        "alternativa_escolhida": "Aumenta a constante de equilíbrio K",
+        "alternativa_correta": "Não altera a constante de equilíbrio K, apenas acelera o processo"
+      },
+      {
+        "numero": 7,
+        "nivel": "Analisar / Difícil",
+        "texto_questao": "Considerando a reação exotérmica A + B ⇌ C + D, quais condições favoreceriam a formação dos produtos?",
+        "alternativa_escolhida": "Alta temperatura e alta pressão",
+        "alternativa_correta": "Baixa temperatura e alta pressão (se há diminuição do número de mols gasosos)"
+      },
+      {
+        "numero": 8,
+        "nivel": "Avaliar / Médio",
+        "texto_questao": "Avalie o impacto da variação de pressão em um equilíbrio químico onde não há diferença no número de mols gasosos entre reagentes e produtos.",
+        "alternativa_escolhida": "A alteração da pressão desloca o equilíbrio para o lado com menos moléculas",
+        "alternativa_correta": "A alteração da pressão não afeta o equilíbrio neste caso"
+      }
+    ],
+    "total_acertos": 5,
+    "total_erros": 5,
+    "notas_por_nivel": {
+      "Lembrar": 7.0,
+      "Compreender": 6.0,
+      "Aplicar": 5.5,
+      "Analisar": 4.2,
+      "Avaliar": 3.8,
+      "Criar": 2.5
+    }
+  }
+}

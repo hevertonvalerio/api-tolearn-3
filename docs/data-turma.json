@@ -1,0 +1,79 @@
+{
+  "dados": {
+    "turma": "3ºA",
+    "serie": "3º ano do Ensino Médio",
+    "disciplina": "Matemática",
+    "professor": "Maria Silva",
+    "periodo": "1º Bimestre - 2025",
+    "tema_edo": "Estudo analítico do ponto",
+    "data_inicio": "2025-06-01",
+    "data_termino": "2025-06-15",
+    "total_alunos": 25,
+    "media_geral": 7.8,
+    "tempo_medio_execucao": "00:28:45",
+    "nivel_maximo_taxonomia": "Criar / Difícil",
+    "distribuicao_notas": {
+      "excelente": 5,
+      "bom": 12,
+      "regular": 6,
+      "insuficiente": 2
+    },
+    "desempenho_por_nivel": {
+      "Lembrar": 8.7,
+      "Compreender": 8.2,
+      "Aplicar": 7.5,
+      "Analisar": 6.8,
+      "Avaliar": 5.9,
+      "Criar": 4.7
+    },
+    "questoes_problematicas": [
+      {
+        "numero": 5,
+        "nivel": "Analisar / Médio",
+        "texto_questao": "Qual ponto equidistante entre A(2,4) e B(6,8) representa corretamente o centro de uma circunferência que passa por ambos?",
+        "taxa_erro": 68,
+        "alternativa_correta": "Ponto N (4,6)"
+      },
+      {
+        "numero": 8,
+        "nivel": "Avaliar / Difícil",
+        "texto_questao": "Considerando os pontos A(1,3), B(4,7) e C(6,2), qual afirmação é verdadeira?",
+        "taxa_erro": 72,
+        "alternativa_correta": "Os pontos não são colineares e formam um triângulo escaleno."
+      }
+    ],
+    "alunos_destacados": {
+      "melhores_desempenhos": [
+        {
+          "nome": "João Pedro Silva",
+          "nota": 9.8,
+          "tempo_execucao": "00:22:15"
+        },
+        {
+          "nome": "Ana Luiza Santos",
+          "nota": 9.5,
+          "tempo_execucao": "00:24:30"
+        },
+        {
+          "nome": "Carlos Eduardo Oliveira",
+          "nota": 9.2,
+          "tempo_execucao": "00:23:45"
+        }
+      ],
+      "necessitam_atencao": [
+        {
+          "nome": "Mariana Costa",
+          "nota": 5.4,
+          "tempo_execucao": "00:35:20",
+          "dificuldades": ["Aplicar", "Avaliar"]
+        },
+        {
+          "nome": "Pedro Henrique Souza",
+          "nota": 5.8,
+          "tempo_execucao": "00:32:15",
+          "dificuldades": ["Analisar", "Criar"]
+        }
+      ]
+    }
+  }
+}

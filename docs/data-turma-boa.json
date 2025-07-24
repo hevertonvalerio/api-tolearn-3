@@ -1,0 +1,79 @@
+{
+  "dados": {
+    "turma": "2ºB",
+    "serie": "2º ano do Ensino Médio",
+    "disciplina": "Geografia",
+    "professor": "Amanda Ribeiro Alves",
+    "periodo": "1º Bimestre - 2025",
+    "tema_edo": "Globalização e Geopolítica",
+    "data_inicio": "2025-06-03",
+    "data_termino": "2025-06-17",
+    "total_alunos": 28,
+    "media_geral": 7.6,
+    "tempo_medio_execucao": "00:31:20",
+    "nivel_maximo_taxonomia": "Avaliar / Difícil",
+    "distribuicao_notas": {
+      "excelente": 6,
+      "bom": 14,
+      "regular": 6,
+      "insuficiente": 2
+    },
+    "desempenho_por_nivel": {
+      "Lembrar": 8.5,
+      "Compreender": 8.0,
+      "Aplicar": 7.4,
+      "Analisar": 7.0,
+      "Avaliar": 6.2,
+      "Criar": 5.5
+    },
+    "questoes_problematicas": [
+      {
+        "numero": 5,
+        "nivel": "Analisar / Médio",
+        "texto_questao": "Analise os impactos da globalização nas economias emergentes nas últimas duas décadas.",
+        "taxa_erro": 58,
+        "alternativa_correta": "Proporcionou crescimento econômico, mas aumentou a desigualdade interna em muitos países."
+      },
+      {
+        "numero": 8,
+        "nivel": "Avaliar / Difícil",
+        "texto_questao": "Avalie as consequências geopolíticas da ascensão da China como potência global para os países latino-americanos.",
+        "taxa_erro": 65,
+        "alternativa_correta": "Aumento das exportações de commodities e maior dependência econômica, além de influência política crescente."
+      }
+    ],
+    "alunos_destacados": {
+      "melhores_desempenhos": [
+        {
+          "nome": "Beatriz Campos Ferreira",
+          "nota": 9.5,
+          "tempo_execucao": "00:26:10"
+        },
+        {
+          "nome": "Gabriel Almeida Dias",
+          "nota": 9.2,
+          "tempo_execucao": "00:27:35"
+        },
+        {
+          "nome": "Larissa Costa Mendes",
+          "nota": 9.0,
+          "tempo_execucao": "00:25:45"
+        }
+      ],
+      "necessitam_atencao": [
+        {
+          "nome": "Thiago Souza Oliveira",
+          "nota": 5.8,
+          "tempo_execucao": "00:36:50",
+          "dificuldades": ["Analisar", "Avaliar"]
+        },
+        {
+          "nome": "Juliana Martins Lima",
+          "nota": 5.5,
+          "tempo_execucao": "00:38:15",
+          "dificuldades": ["Avaliar", "Criar"]
+        }
+      ]
+    }
+  }
+}

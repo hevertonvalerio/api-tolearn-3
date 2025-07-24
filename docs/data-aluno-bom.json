@@ -1,0 +1,54 @@
+{
+  "dados": {
+    "nome_aluno": "Rafael Oliveira Santos",
+    "disciplina": "História",
+    "turma": "1ºA",
+    "serie": "1º ano do Ensino Médio",
+    "tema_edo": "Revolução Industrial",
+    "nota_edo": 7.8,
+    "data_inicio": "2025-06-12 09:20",
+    "data_termino": "2025-06-12 09:53",
+    "tempo_total_execucao": "00:33:15",
+    "tempo_medio_questao": "02:46",
+    "nivel_maximo_taxonomia": "Avaliar / Médio",
+    "distribuicao_notas": {
+      "excelente": 0,
+      "bom": 1,
+      "regular": 0,
+      "insuficiente": 0
+    },
+    "questoes_erradas": [
+      {
+        "numero": 4,
+        "nivel": "Aplicar / Médio",
+        "texto_questao": "Relacione as transformações sociais da Revolução Industrial com o crescimento urbano na Inglaterra.",
+        "alternativa_escolhida": "O crescimento urbano diminuiu a taxa de mortalidade nas cidades.",
+        "alternativa_correta": "O êxodo rural aumentou significativamente a densidade populacional urbana."
+      },
+      {
+        "numero": 7,
+        "nivel": "Analisar / Difícil",
+        "texto_questao": "Quais foram as principais consequências da mecanização para a classe trabalhadora?",
+        "alternativa_escolhida": "Aumento imediato dos salários e melhores condições de trabalho",
+        "alternativa_correta": "Desemprego em certos setores e surgimento de movimentos de resistência operária"
+      },
+      {
+        "numero": 9,
+        "nivel": "Avaliar / Médio",
+        "texto_questao": "Avalie o impacto do Ludismo como resposta às transformações tecnológicas da época.",
+        "alternativa_escolhida": "Foi um movimento intelectual que buscava compreender as máquinas cientificamente",
+        "alternativa_correta": "Foi uma reação dos trabalhadores contra a substituição da mão de obra pelas máquinas"
+      }
+    ],
+    "total_acertos": 7,
+    "total_erros": 3,
+    "notas_por_nivel": {
+      "Lembrar": 9.0,
+      "Compreender": 8.5,
+      "Aplicar": 7.5,
+      "Analisar": 6.8,
+      "Avaliar": 6.0,
+      "Criar": 5.0
+    }
+  }
+}

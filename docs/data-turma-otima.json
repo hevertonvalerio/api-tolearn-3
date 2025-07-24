@@ -1,0 +1,66 @@
+{
+  "dados": {
+    "turma": "1ºA",
+    "serie": "1º ano do Ensino Médio",
+    "disciplina": "Português",
+    "professor": "Carlos Eduardo Martins",
+    "periodo": "2º Bimestre - 2025",
+    "tema_edo": "Análise Literária - Modernismo",
+    "data_inicio": "2025-06-05",
+    "data_termino": "2025-06-12",
+    "total_alunos": 30,
+    "media_geral": 9.2,
+    "tempo_medio_execucao": "00:25:30",
+    "nivel_maximo_taxonomia": "Criar / Difícil",
+    "distribuicao_notas": {
+      "excelente": 18,
+      "bom": 9,
+      "regular": 3,
+      "insuficiente": 0
+    },
+    "desempenho_por_nivel": {
+      "Lembrar": 9.8,
+      "Compreender": 9.6,
+      "Aplicar": 9.4,
+      "Analisar": 9.1,
+      "Avaliar": 8.8,
+      "Criar": 8.5
+    },
+    "questoes_problematicas": [
+      {
+        "numero": 9,
+        "nivel": "Criar / Difícil",
+        "texto_questao": "Elabore uma análise comparativa entre as características do Modernismo da primeira fase e os elementos presentes na obra 'Macunaíma' de Mário de Andrade.",
+        "taxa_erro": 42,
+        "alternativa_correta": "A obra representa o projeto nacionalista do Modernismo, utilizando linguagem coloquial e incorporando elementos do folclore brasileiro para questionar a identidade nacional."
+      }
+    ],
+    "alunos_destacados": {
+      "melhores_desempenhos": [
+        {
+          "nome": "Sophia Lima Castro",
+          "nota": 10.0,
+          "tempo_execucao": "00:22:10"
+        },
+        {
+          "nome": "Felipe Mendes Oliveira",
+          "nota": 10.0,
+          "tempo_execucao": "00:23:45"
+        },
+        {
+          "nome": "Isabela Santos Costa",
+          "nota": 9.9,
+          "tempo_execucao": "00:21:30"
+        }
+      ],
+      "necessitam_atencao": [
+        {
+          "nome": "Lucas Pereira Silva",
+          "nota": 7.5,
+          "tempo_execucao": "00:32:15",
+          "dificuldades": ["Criar", "Avaliar"]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "dados": {
+    "nome_aluno": "Julia Mendes Carvalho",
+    "disciplina": "Física",
+    "turma": "2ºB",
+    "serie": "2º ano do Ensino Médio",
+    "tema_edo": "Movimento Uniforme e Movimento Uniformemente Variado",
+    "nota_edo": 9.7,
+    "data_inicio": "2025-06-10 13:45",
+    "data_termino": "2025-06-10 14:12",
+    "tempo_total_execucao": "00:27:23",
+    "tempo_medio_questao": "01:49",
+    "nivel_maximo_taxonomia": "Criar / Difícil",
+    "distribuicao_notas": {
+      "excelente": 1,
+      "bom": 0,
+      "regular": 0,
+      "insuficiente": 0
+    },
+    "questoes_erradas": [
+      {
+        "numero": 10,
+        "nivel": "Criar / Difícil",
+        "texto_questao": "Um objeto é lançado verticalmente para cima com velocidade de 20 m/s. Considerando g = 10 m/s², esboce um experimento que permita verificar a altura máxima atingida pelo objeto.",
+        "alternativa_escolhida": "Usar sensor de ultrassom para medir a distância em intervalos de 0,5s",
+        "alternativa_correta": "Usar sensor de altura com medição contínua e registrar o valor máximo"
+      }
+    ],
+    "total_acertos": 9,
+    "total_erros": 1,
+    "notas_por_nivel": {
+      "Lembrar": 10.0,
+      "Compreender": 10.0,
+      "Aplicar": 9.5,
+      "Analisar": 9.8,
+      "Avaliar": 9.2,
+      "Criar": 8.6
+    }
+  }
+}
